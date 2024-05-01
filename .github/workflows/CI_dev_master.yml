@@ -1,0 +1,40 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI_dev_master
+
+# Controls when the workflow will run
+on:
+  workflow_run:
+    workflows: ["CI_dev"]
+    branches: ["dev"]
+    types:
+      - completed
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  merge-to-master:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Fetch changes from origin
+        run: git fetch --prune
+        
+      - name: Check for changes in dev branch
+        run: |
+          CHANGED_FILES=$(git log --format=format: --name-only origin/master..origin/dev | sort -u)
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No changes in dev branch to merge."
+            exit 0
+          fi
+
+      - name: Merge to master
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git checkout master
+          git merge --no-ff --no-edit --allow-unrelated-histories origin/dev
+          git push origin master
