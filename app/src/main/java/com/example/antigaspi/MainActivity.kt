@@ -28,11 +28,15 @@ import org.json.JSONObject
 class MainActivity : AppCompatActivity() {
 
     private lateinit var todoAdapter: TodoAdapter
+    private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        todoAdapter = TodoAdapter(mutableListOf())
+
+        // For memory retention of the list
+        sharedPreferencesHelper = SharedPreferencesHelper(this)
+        todoAdapter = TodoAdapter(sharedPreferencesHelper.loadTodoList())
 
         val rvTodoItems = findViewById<RecyclerView>(R.id.rvTodoItems)
         rvTodoItems.adapter = todoAdapter
@@ -45,6 +49,7 @@ class MainActivity : AppCompatActivity() {
             if (todoTitle.isNotEmpty()) {
                 val todo = Todo(todoTitle)
                 todoAdapter.addTodo(todo)
+                sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
                 etTodoTitle.text.clear()
             }
         }
@@ -52,6 +57,7 @@ class MainActivity : AppCompatActivity() {
         val btnDeleteDone = findViewById<Button>(R.id.btnDeleteDoneTodos)
         btnDeleteDone.setOnClickListener {
             todoAdapter.deleteDoneTodos()
+            sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
         }
 
 
@@ -163,6 +169,7 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onDestroy() {
+        sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
         super.onDestroy()
     }
 
