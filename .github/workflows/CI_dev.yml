@@ -25,7 +25,6 @@ jobs:
       - name: Checkout code
         # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
         uses: actions/checkout@v4
-      
 
       # Runs a single command using the runners shell
       - name: Set up JDK 11
@@ -34,10 +33,19 @@ jobs:
           java-version: '11'
           distribution: adopt
 
-      #- name: Grant execute permission for gradlew
-        #run: chmod +x gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
       # Runs a set of commands using the runners shell
       - name: Build with Gradle
-        run: echo "Hello World"
-        #run: ./gradlew build
+        run: ./gradlew build
+
+      # Run the unit tests in location src/test/java
+      - name: Run unit tests
+        run: ./gradlew test
+
+      - name: Archive test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: build/reports/tests/test
