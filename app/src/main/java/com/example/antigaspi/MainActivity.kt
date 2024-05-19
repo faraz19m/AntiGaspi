@@ -79,6 +79,8 @@ class MainActivity : AppCompatActivity() {
             launch {
                 val url = "https://world.openfoodfacts.net/api/v2/product/" + barcode
 
+                Log.d("myapp Barcode", "Product JSON: ${barcode.toString()}")
+
                 Log.d("myapp", "sending request...")
                 val response: HttpResponse = httpClient.get(url)
 
@@ -86,16 +88,22 @@ class MainActivity : AppCompatActivity() {
 
 
                 try {
-                    var json = JSONObject(bd)
-                    var product = JSONObject(json.getString("product"))
-                    Log.d("myapp", product.toString().take(20))
+                    val json = JSONObject(bd)
+                    val product = JSONObject(json.getString("product"))
+                    Log.d("myapp", "Product JSON: ${product.toString()}")
 
-                    var productName = product.getString("abbreviated_product_name")
-                    Log.d("myapp", (productName).toString())
+                    val productName = if (product.has("product_name")) {
+                        product.getString("product_name")
+                    } else {
+                        "Unknown Product"
+                    }
+                    Log.d("myapp", productName)
                     todoAdapter.addTodo(Todo(productName.take(20)))
+                    sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
                 } catch (e: Exception) {
-                    // TODO: do something else if there is an error
-                    todoAdapter.addTodo(Todo(e.toString()))
+                    Log.e("myapp", "Error parsing JSON: ${e.message}")
+                    todoAdapter.addTodo(Todo("Error: ${e.message}"))
+                    sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
                 }
 
             }
