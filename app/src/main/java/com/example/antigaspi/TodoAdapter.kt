@@ -7,12 +7,30 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import android.content.Context
+import android.content.Intent
 
 class TodoAdapter(
+    private val context: Context,
     private val todos: MutableList<Todo>
 ) : RecyclerView.Adapter<TodoAdapter.TodoViewHolder>() {
 
-    class TodoViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)
+    inner class TodoViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+        val tvTodoTitle: TextView = itemView.findViewById(R.id.tvTodoTitle)
+        val cbDone: CheckBox = itemView.findViewById(R.id.cbDone)
+
+        init {
+            itemView.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val selectedTodo = todos[position]
+                    val intent = Intent(context, TodoDetailActivity::class.java)
+                    intent.putExtra("todo_title", selectedTodo.title)
+                    context.startActivity(intent)
+                }
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
         return TodoViewHolder(

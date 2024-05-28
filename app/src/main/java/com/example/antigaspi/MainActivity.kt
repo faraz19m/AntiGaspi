@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         // For memory retention of the list
         sharedPreferencesHelper = SharedPreferencesHelper(this)
-        todoAdapter = TodoAdapter(sharedPreferencesHelper.loadTodoList())
+        todoAdapter = TodoAdapter(this, sharedPreferencesHelper.loadTodoList())
 
         val rvTodoItems = findViewById<RecyclerView>(R.id.rvTodoItems)
         rvTodoItems.adapter = todoAdapter
