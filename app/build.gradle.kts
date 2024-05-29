@@ -82,4 +82,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.gson)
+
+    implementation("com.google.mlkit:text-recognition:16.0.0")
 }
