@@ -30,8 +30,8 @@ class OCRHelper(private val context: Context) {
 
     private fun extractExpiryDate(text: String): String? {
         // Regular expressions to match different date formats
-        val pattern1 = Pattern.compile("(?m)\\b(\\d{2})[-/]?\\d{2}[-/]?(\\d{2})\\b") // 6 digit pattern
-        val pattern2 = Pattern.compile("(?m)\\b(\\d{2})[-/]?\\d{2}[-/]?(\\d{4})\\b") // 8 digit pattern
+        val pattern1 = Pattern.compile("(?m)\\b(\\d{2})[-/ ]?\\d{2}[-/ ]?(\\d{2})\\b") // 6 digit pattern
+        val pattern2 = Pattern.compile("(?m)\\b(\\d{2})[-/ ]?\\d{2}[-/ ]?(\\d{4})\\b") // 8 digit pattern
         val pattern3 = Pattern.compile("(?m)\\b(\\d{2})[^\\d]*(?:\\p{L}{3})[^\\d]*(\\d{2})\\b") // dd-???-yy
         val pattern4 = Pattern.compile("(?m)\\b(\\d{2})[^\\d]*(?:\\p{L}{3})[^\\d]*(\\d{4})\\b") // dd-???-yyyy
 
