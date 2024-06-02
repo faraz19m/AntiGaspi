@@ -1,5 +1,6 @@
 package com.example.antigaspi
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
@@ -11,6 +12,9 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
@@ -18,6 +22,29 @@ class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+
+
+        val sw = findViewById<SwitchMaterial>(R.id.swDayNightMode)
+
+        // set switch to checked if night mode is on
+        val currentNightMode = AppCompatDelegate.getDefaultNightMode()
+        sw.isChecked = currentNightMode == AppCompatDelegate.MODE_NIGHT_YES
+
+        // TODO: Use SharedPreferencesHelper for this? or similar class
+        val sharedPreferences = getSharedPreferences("ThemePref", Context.MODE_PRIVATE)
+        // add listener
+        sw.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                sharedPreferences.edit().putInt("NightMode", AppCompatDelegate.MODE_NIGHT_YES).apply()
+
+            } else {
+
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                sharedPreferences.edit().putInt("NightMode", AppCompatDelegate.MODE_NIGHT_NO).apply()
+            }
+            recreate()
+        }
         // set back button on menu
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         // set title on menu

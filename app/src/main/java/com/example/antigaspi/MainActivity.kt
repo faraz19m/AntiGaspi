@@ -1,5 +1,6 @@
 package com.example.antigaspi
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.common.api.OptionalModuleApi
@@ -34,9 +36,21 @@ class MainActivity : AppCompatActivity() {
     private lateinit var todoAdapter: TodoAdapter
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val sharedPreferences = getSharedPreferences("ThemePref", Context.MODE_PRIVATE)
+        val nightMode = sharedPreferences.getInt("NightMode", AppCompatDelegate.MODE_NIGHT_NO)
+        AppCompatDelegate.setDefaultNightMode(nightMode)
+
+
+
         setContentView(R.layout.activity_main)
+
+
+
+
 
         // show logo on action bar
         supportActionBar?.setDisplayShowTitleEnabled(true)
@@ -51,13 +65,13 @@ class MainActivity : AppCompatActivity() {
         sharedPreferencesHelper = SharedPreferencesHelper(this)
         todoAdapter = TodoAdapter(this, sharedPreferencesHelper.loadTodoList())
 
-        val rvTodoItems = findViewById<RecyclerView>(R.id.rvTodoItems)
+        val rvTodoItems = findViewById<RecyclerView>(R.id.rvFoodItems)
         rvTodoItems.adapter = todoAdapter
         rvTodoItems.layoutManager = LinearLayoutManager(this)
 
-        val btnAddTodo = findViewById<Button>(R.id.btnAddTodo)
+        val btnAddTodo = findViewById<Button>(R.id.btnAddItemManually)
         btnAddTodo.setOnClickListener {
-            val etTodoTitle = findViewById<EditText>(R.id.etTodoTitle)
+            val etTodoTitle = findViewById<EditText>(R.id.etFoodTitle)
             val todoTitle = etTodoTitle.text.toString()
             if (todoTitle.isNotEmpty()) {
                 val todo = Todo(todoTitle)
@@ -173,6 +187,13 @@ class MainActivity : AppCompatActivity() {
         inflater.inflate(R.menu.menubar, menu)
         super.onCreateOptionsMenu(menu)
         return true
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+
+
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
