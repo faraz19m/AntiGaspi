@@ -1,7 +1,11 @@
 package com.example.antigaspi
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -154,6 +158,23 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.menubar, menu)
+        super.onCreateOptionsMenu(menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            // open settings page
+            R.id.menubar_settings -> startActivity(Intent(this, SettingsActivity::class.java))
+
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
     private fun moduleInstall(client: ModuleInstallClient) {
 
         val optionalModuleApi: OptionalModuleApi = GmsBarcodeScanning.getClient(this)
