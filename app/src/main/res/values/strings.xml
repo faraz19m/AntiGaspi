@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">AntiGaspi</string>
+    <string name="set_expiration_setting1">Notify me</string>
+    <string name="set_expiration_setting2">days before expiration.</string>
 </resources>

@@ -38,6 +38,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // show logo on action bar
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setIcon(R.drawable.ic_default_icon)
+        supportActionBar?.title = " AntiGaspi"
+
+
+
+
         // For memory retention of the list
         sharedPreferencesHelper = SharedPreferencesHelper(this)
         todoAdapter = TodoAdapter(this, sharedPreferencesHelper.loadTodoList())

@@ -1,6 +1,10 @@
 package com.example.antigaspi
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -14,6 +18,12 @@ class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+        // set back button on menu
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        // set title on menu
+        supportActionBar?.title = "Settings"
+
+        // set up spinner
         val spinner: Spinner = findViewById(R.id.sSetExpirationDays)
         spinner.setSelection(0)
         spinner.onItemSelectedListener = this
@@ -30,10 +40,33 @@ class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.menubar_settings, menu)
+        super.onCreateOptionsMenu(menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            // go back to main activity
+            android.R.id.home -> {
+                val intent: Intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+                return true
+            }
+
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         var ar = R.array.days_before_expiration
         val spinner: Spinner = findViewById(R.id.sSetExpirationDays)
         spinner.setSelection(position)
+        // TODO: Save the setting
 
 
     }
