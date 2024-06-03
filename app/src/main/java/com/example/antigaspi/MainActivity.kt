@@ -35,7 +35,7 @@ import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var todoAdapter: TodoAdapter
+    private lateinit var foodItemAdapter: FoodItemAdapter
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
 
@@ -66,11 +66,11 @@ class MainActivity : AppCompatActivity() {
 
         // For memory retention of the list
         sharedPreferencesHelper = SharedPreferencesHelper(this)
-        todoAdapter = TodoAdapter(this, sharedPreferencesHelper.loadTodoList())
+        foodItemAdapter = FoodItemAdapter(this, sharedPreferencesHelper.loadFoodItemList())
 
-        val rvTodoItems = findViewById<RecyclerView>(R.id.rvFoodItems)
-        rvTodoItems.adapter = todoAdapter
-        rvTodoItems.layoutManager = LinearLayoutManager(this)
+        val rvFoodItems = findViewById<RecyclerView>(R.id.rvFoodItems)
+        rvFoodItems.adapter = foodItemAdapter
+        rvFoodItems.layoutManager = LinearLayoutManager(this)
 
 
 
@@ -101,8 +101,8 @@ class MainActivity : AppCompatActivity() {
         // button to delete items
         val btnDeleteDone = findViewById<Button>(R.id.btnDeleteDoneItems)
         btnDeleteDone.setOnClickListener {
-            todoAdapter.deleteDoneTodos()
-            sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
+            foodItemAdapter.deleteDoneFoodItems()
+            sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
         }
 
 
@@ -143,12 +143,12 @@ class MainActivity : AppCompatActivity() {
                         "Unknown Product"
                     }
                     Log.d("myapp", productName)
-                    todoAdapter.addTodo(Todo(productName.take(20)))
-                    sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
+                    foodItemAdapter.addFoodItem(FoodItem(productName.take(20)))
+                    sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
                 } catch (e: Exception) {
                     Log.e("myapp", "Error parsing JSON: ${e.message}")
-                    todoAdapter.addTodo(Todo("Error: ${e.message}"))
-                    sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
+                    foodItemAdapter.addFoodItem(FoodItem("Error: ${e.message}"))
+                    sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
                 }
 
             }
@@ -211,8 +211,8 @@ class MainActivity : AppCompatActivity() {
     // If data is not empty, then that value will be used to create a new food item and store it.
     private fun processDataFromDialog(data: String) {
         if (data != "") {
-            todoAdapter.addTodo(Todo(data))
-            sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
+            foodItemAdapter.addFoodItem(FoodItem(data))
+            sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
         }
 
     }
@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onDestroy() {
-        sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
+        sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
         super.onDestroy()
     }
 

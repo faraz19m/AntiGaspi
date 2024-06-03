@@ -12,27 +12,27 @@ import androidx.appcompat.app.AppCompatActivity
 import android.content.Context
 import android.content.SharedPreferences
 
-class TodoDetailActivity : AppCompatActivity() {
+class FoodItemDetailActivity : AppCompatActivity() {
 
     private lateinit var ocrHelper: OCRHelper
-    private lateinit var tvTodoTitle: TextView
+    private lateinit var tvFoodItemTitle: TextView
     private lateinit var tvScannedText: TextView
     private val REQUEST_IMAGE_CAPTURE = 1
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_todo_detail)
+        setContentView(R.layout.activity_food_item_detail)
 
         ocrHelper = OCRHelper(this)
         sharedPreferences = getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
 
         // Get the data passed from MainActivity
-        val todoTitle = intent.getStringExtra("todo_title")
+        val foodItemTitle = intent.getStringExtra("todo_title")
 
-        // Set the todo title to the TextView
-        tvTodoTitle = findViewById(R.id.tvTodoTitle)
-        tvTodoTitle.text = todoTitle
+        // Set the title to the TextView
+        tvFoodItemTitle = findViewById(R.id.tvFoodItemTitle)
+        tvFoodItemTitle.text = foodItemTitle
 
         // Initialize the scanned text TextView
         tvScannedText = findViewById(R.id.tvScannedText)

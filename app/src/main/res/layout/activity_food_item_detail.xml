@@ -7,7 +7,7 @@
 
     <!-- TextView to display the item name -->
     <TextView
-        android:id="@+id/tvTodoTitle"
+        android:id="@+id/tvFoodItemTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="18sp"
