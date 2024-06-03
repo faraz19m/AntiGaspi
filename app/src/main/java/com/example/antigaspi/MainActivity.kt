@@ -1,11 +1,19 @@
 package com.example.antigaspi
 
+import android.content.Context
+import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.common.api.OptionalModuleApi
@@ -30,31 +38,68 @@ class MainActivity : AppCompatActivity() {
     private lateinit var todoAdapter: TodoAdapter
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Get night mode value from preferences
+        val sharedPreferences = getSharedPreferences("ThemePref", Context.MODE_PRIVATE)
+        val nightMode = sharedPreferences.getInt("NightMode", AppCompatDelegate.MODE_NIGHT_NO)
+        AppCompatDelegate.setDefaultNightMode(nightMode)
+
+
+
         setContentView(R.layout.activity_main)
+
+
+
+
+
+        // show logo on action bar
+        supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setIcon(R.drawable.ic_default_icon)
+        supportActionBar?.title = " AntiGaspi"
+
+
+
 
         // For memory retention of the list
         sharedPreferencesHelper = SharedPreferencesHelper(this)
         todoAdapter = TodoAdapter(this, sharedPreferencesHelper.loadTodoList())
 
-        val rvTodoItems = findViewById<RecyclerView>(R.id.rvTodoItems)
+        val rvTodoItems = findViewById<RecyclerView>(R.id.rvFoodItems)
         rvTodoItems.adapter = todoAdapter
         rvTodoItems.layoutManager = LinearLayoutManager(this)
 
-        val btnAddTodo = findViewById<Button>(R.id.btnAddTodo)
-        btnAddTodo.setOnClickListener {
-            val etTodoTitle = findViewById<EditText>(R.id.etTodoTitle)
-            val todoTitle = etTodoTitle.text.toString()
-            if (todoTitle.isNotEmpty()) {
-                val todo = Todo(todoTitle)
-                todoAdapter.addTodo(todo)
-                sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
-                etTodoTitle.text.clear()
-            }
+
+
+        // edittext in dialog
+        val et = EditText(this)
+        // create dialog
+        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+        builder.setTitle("Enter food name")
+            .setView(et)
+        builder.setPositiveButton("OK") { dialog: DialogInterface?, which: Int ->
+            processDataFromDialog(et.text.toString())
+            et.text.clear()
+
+        }
+        builder.setNegativeButton("Back", { dialogInterface: DialogInterface, i: Int ->
+
+        })
+
+        // button to add food manually opens dialog
+        val btnAddFoodManually = findViewById<Button>(R.id.btnAddItemManually)
+        val dialog: AlertDialog = builder.create()
+        btnAddFoodManually.setOnClickListener {
+            dialog.show()
+
+
         }
 
-        val btnDeleteDone = findViewById<Button>(R.id.btnDeleteDoneTodos)
+        // button to delete items
+        val btnDeleteDone = findViewById<Button>(R.id.btnDeleteDoneItems)
         btnDeleteDone.setOnClickListener {
             todoAdapter.deleteDoneTodos()
             sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
@@ -154,6 +199,33 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.menubar, menu)
+        super.onCreateOptionsMenu(menu)
+        return true
+    }
+
+    // Process the data from the dialog for adding items manually.
+    // If data is not empty, then that value will be used to create a new food item and store it.
+    private fun processDataFromDialog(data: String) {
+        if (data != "") {
+            todoAdapter.addTodo(Todo(data))
+            sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
+        }
+
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            // open settings page
+            R.id.menubar_settings -> startActivity(Intent(this, SettingsActivity::class.java))
+
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
     private fun moduleInstall(client: ModuleInstallClient) {
 
         val optionalModuleApi: OptionalModuleApi = GmsBarcodeScanning.getClient(this)

@@ -9,50 +9,52 @@
     tools:context=".MainActivity">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvTodoItems"
+        android:id="@+id/rvFoodItems"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/etTodoTitle"
+        app:layout_constraintBottom_toTopOf="@+id/btnDeleteDoneItems"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <EditText
-        android:id="@+id/etTodoTitle"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="0dp"
-        android:hint="Enter Todo"
-        app:layout_constraintBottom_toTopOf="@+id/btnAddTodo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+
+
+
 
     <Button
-        android:id="@+id/btnAddTodo"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Add Todo"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnDeleteDoneTodos"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/btnDeleteDoneTodos"
+        android:id="@+id/btnDeleteDoneItems"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Delete done"
-        app:layout_constraintTop_toBottomOf="@+id/etTodoTitle"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnScan"
-        app:layout_constraintStart_toEndOf="@+id/btnAddTodo" />
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnScan"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btnScan"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Scan"
+        android:text="Scan barcode"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnAddItemManually"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btnAddItemManually"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="No barcode"
+        android:layout_marginStart="75dp"
+        android:layout_marginEnd="75dp"
+        android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btnDeleteDoneTodos" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
