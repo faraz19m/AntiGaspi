@@ -67,8 +67,10 @@ class FoodItemAdapter(
         val curFoodItem = foodItems[position]
         holder.itemView.apply {
             val tvFoodItemTitle = findViewById<TextView>(R.id.tvFoodItemTitle)
+            val tvExpirationDate = findViewById<TextView>(R.id.tvExpirationDate)
             val cbDone = findViewById<CheckBox>(R.id.cbDone)
             tvFoodItemTitle.text = curFoodItem.title
+            tvExpirationDate.text = curFoodItem.expirationDate.toString()
             cbDone.isChecked = curFoodItem.isChecked
             toggleStrikeThrough(tvFoodItemTitle, curFoodItem.isChecked)
             cbDone.setOnCheckedChangeListener { _, isChecked ->
