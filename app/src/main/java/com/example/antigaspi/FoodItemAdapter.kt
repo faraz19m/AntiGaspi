@@ -9,11 +9,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import android.content.Context
 import android.content.Intent
+import androidx.recyclerview.widget.SortedList
+import androidx.recyclerview.widget.SortedListAdapterCallback
 
 class FoodItemAdapter(
     private val context: Context,
-    private val foodItems: MutableList<FoodItem>
+
 ) : RecyclerView.Adapter<FoodItemAdapter.FoodItemViewHolder>() {
+    private var foodItems: SortedList<FoodItem>;
 
     inner class FoodItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         val tvFoodItemTitle: TextView = itemView.findViewById(R.id.tvFoodItemTitle)
@@ -29,7 +32,25 @@ class FoodItemAdapter(
                     context.startActivity(intent)
                 }
             }
+
+
         }
+    }
+
+    init {
+        foodItems = SortedList(FoodItem::class.java, object : SortedListAdapterCallback<FoodItem>(this) {
+            override fun compare(f1: FoodItem, f2: FoodItem): Int {
+                // add a minus to invert
+                return -f1.compareDates(f2)
+
+            }
+
+            override fun areContentsTheSame(oldItem: FoodItem, newItem: FoodItem): Boolean {
+                return (oldItem.expirationDate?.time  == newItem.expirationDate?.time) && (oldItem.deepFreeze == newItem.deepFreeze) && (oldItem.title == newItem.title) && (oldItem.isChecked) && (newItem.isChecked)
+            }
+
+            override fun areItemsTheSame(item1: FoodItem, item2: FoodItem): Boolean = item1 == item2
+        })
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FoodItemViewHolder {
@@ -44,14 +65,15 @@ class FoodItemAdapter(
 
     fun addFoodItem(foodItem:FoodItem) {
         foodItems.add(foodItem)
-        notifyItemInserted(foodItems.size - 1)
+        notifyItemInserted(foodItems.size() - 1)
     }
 
     fun deleteDoneFoodItems() {
+        /*
         foodItems.removeAll { item ->
             item.isChecked
         }
-
+        */
         notifyDataSetChanged()
     }
 
@@ -70,7 +92,7 @@ class FoodItemAdapter(
             val tvExpirationDate = findViewById<TextView>(R.id.tvExpirationDate)
             val cbDone = findViewById<CheckBox>(R.id.cbDone)
             tvFoodItemTitle.text = curFoodItem.title
-            tvExpirationDate.text = curFoodItem.expirationDate.toString()
+            tvExpirationDate.text = curFoodItem.getPrettyDate()
             cbDone.isChecked = curFoodItem.isChecked
             toggleStrikeThrough(tvFoodItemTitle, curFoodItem.isChecked)
             cbDone.setOnCheckedChangeListener { _, isChecked ->
@@ -81,10 +103,10 @@ class FoodItemAdapter(
     }
 
     override fun getItemCount(): Int {
-        return foodItems.size
+        return foodItems.size()
     }
 
-    fun getFoodItems(): MutableList<FoodItem> {
+    fun getFoodItems(): SortedList<FoodItem> {
         return foodItems
     }
 }

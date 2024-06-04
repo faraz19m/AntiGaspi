@@ -31,6 +31,8 @@ import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
+import java.util.Calendar
+import java.util.Date
 
 
 class MainActivity : AppCompatActivity() {
@@ -63,10 +65,17 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
         // For memory retention of the list
         sharedPreferencesHelper = SharedPreferencesHelper(this)
-        foodItemAdapter = FoodItemAdapter(this, sharedPreferencesHelper.loadFoodItemList())
+        foodItemAdapter = FoodItemAdapter(this)
+        // add items from shared preferences to the adapter
+        foodItemAdapter.getFoodItems().addAll(sharedPreferencesHelper.loadFoodItemList())
+
+        foodItemAdapter.getFoodItems().add(FoodItem(title = "1", expirationDate = Date(124,7,20,1,1,1)))
+
+        foodItemAdapter.getFoodItems().add(FoodItem(title = "2", expirationDate = Date(124,7,22,1,1,1)))
+        foodItemAdapter.getFoodItems().add(FoodItem(title = "3", expirationDate = Date(124,7,24,1,1,1)))
+        foodItemAdapter.getFoodItems().add(FoodItem(title = "4", expirationDate = Date(124,7,26,1,1,1)))
 
         val rvFoodItems = findViewById<RecyclerView>(R.id.rvFoodItems)
         rvFoodItems.adapter = foodItemAdapter
