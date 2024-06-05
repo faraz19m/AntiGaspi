@@ -34,5 +34,9 @@ class FoodItem(
         }).toInt()
 
     }
+
+    fun compareContents(foodItem:FoodItem): Boolean {
+        return title == foodItem.title && isChecked == foodItem.isChecked && compareDates(foodItem) == 0 && deepFreeze == foodItem.deepFreeze
+    }
 }
 

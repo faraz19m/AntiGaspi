@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.common.api.OptionalModuleApi
@@ -71,17 +72,22 @@ class MainActivity : AppCompatActivity() {
         // add items from shared preferences to the adapter
         foodItemAdapter.getFoodItems().addAll(sharedPreferencesHelper.loadFoodItemList())
 
-        foodItemAdapter.getFoodItems().add(FoodItem(title = "1", expirationDate = Date(124,7,20,1,1,1)))
+        // dummy items TODO: Remove this
+        foodItemAdapter.getFoodItems().add(FoodItem(title = "aaaaa", expirationDate = Date(124,7,20,1,1,1)))
+        foodItemAdapter.getFoodItems().add(FoodItem(title = "bbbbb", expirationDate = Date(124,7,22,1,1,1)))
+        foodItemAdapter.getFoodItems().add(FoodItem(title = "cccccc", expirationDate = Date(124,7,24,1,1,1)))
+        foodItemAdapter.getFoodItems().add(FoodItem(title = "dddddd", expirationDate = Date(124,7,26,1,1,1)))
 
-        foodItemAdapter.getFoodItems().add(FoodItem(title = "2", expirationDate = Date(124,7,22,1,1,1)))
-        foodItemAdapter.getFoodItems().add(FoodItem(title = "3", expirationDate = Date(124,7,24,1,1,1)))
-        foodItemAdapter.getFoodItems().add(FoodItem(title = "4", expirationDate = Date(124,7,26,1,1,1)))
-
+        // Set up recyclerview
         val rvFoodItems = findViewById<RecyclerView>(R.id.rvFoodItems)
         rvFoodItems.adapter = foodItemAdapter
         rvFoodItems.layoutManager = LinearLayoutManager(this)
 
-
+        // editText for filtering by a string
+        val etFilter = findViewById<EditText>(R.id.etFilter)
+        etFilter.addTextChangedListener { input ->
+            foodItemAdapter.filter.filter(input)
+        }
 
         // edittext in dialog
         val et = EditText(this)
@@ -106,6 +112,8 @@ class MainActivity : AppCompatActivity() {
 
 
         }
+
+
 
         // button to delete items
         val btnDeleteDone = findViewById<Button>(R.id.btnDeleteDoneItems)
