@@ -35,15 +35,20 @@ class FoodItemAdapter(
     var currentFilter: String = ""
 
     /**
+     * If true then the recyclerView only shows items where [FoodItem.isChecked].
+     */
+    var showOnlyDeepFreeze = false
+
+    /**
      * Filters by a CharSequence.
      * Only keep the foodItems whose title contains the CharSequence.
      */
     private val filter: Filter = object : Filter() {
         override fun performFiltering(input: CharSequence): FilterResults {
             val filteredList = if (currentFilter.isEmpty()) {
-                foodItems
+                foodItems.filter { !showOnlyDeepFreeze || it.deepFreeze }
             } else {
-                foodItems.filter { it.title.lowercase().contains(currentFilter) }
+                foodItems.filter { it.title.lowercase().contains(currentFilter) && (!showOnlyDeepFreeze || it.deepFreeze) }
             }
             return FilterResults().apply { values = filteredList }
         }

@@ -9,6 +9,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -117,6 +118,12 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        val cbDeepFreeze = findViewById<CheckBox>(R.id.cbSelectDeepFreeze)
+        cbDeepFreeze.setOnCheckedChangeListener { _, isChecked ->
+            foodItemAdapter.showOnlyDeepFreeze = isChecked
+            foodItemAdapter.filter.filter("")
+            foodItemAdapter.notifyDataSetChanged()
+        }
 
 
         // button to delete items
