@@ -2,6 +2,13 @@ package com.example.antigaspi
 
 import java.util.Date
 
+/**
+ * A food item.
+ * @param title The  name of the item
+ * @param isChecked If the item is checked
+ * @param expirationDate When the item expires
+ * @param deepFreeze If the item is deep frozen.
+ */
 class FoodItem(
     var title:String,
     var isChecked: Boolean = false,
@@ -9,6 +16,9 @@ class FoodItem(
     var deepFreeze: Boolean = false,
 
     ) {
+    /**
+     * @return A string of the [expirationDate] used to display to the user.
+     */
     fun getPrettyDate(): String {
         val d = expirationDate ?: return "/"
         var res = ""
@@ -16,13 +26,16 @@ class FoodItem(
         return res
 
     }
-    // Compare the expirationDate between this and foodItem.
-    // Returns a positive integer if this has a bigger date or foodItem is null.
-    // Returns a negative integer if this has a smaller date or if this is null.
-    // Returns 0 if both are the same or null.
-    fun compareDates(foodItem: FoodItem): Int {
+
+    /**
+     * Compares the expirationDate between this and [item].
+     * @return - A positive integer if this has a bigger date or [item] is null
+     * - A negative integer if this has a smaller date or if this is null
+     * - 0 if both are the same or both are null.
+     */
+    fun compareDates(item: FoodItem): Int {
         val t1 = this.expirationDate
-        val t2 = foodItem.expirationDate
+        val t2 = item.expirationDate
         return if (t1 == null && t2 == null) {
             0
         } else (if (t1  == null) {
@@ -35,8 +48,11 @@ class FoodItem(
 
     }
 
-    fun compareContents(foodItem:FoodItem): Boolean {
-        return title == foodItem.title && isChecked == foodItem.isChecked && compareDates(foodItem) == 0 && deepFreeze == foodItem.deepFreeze
+    /**
+     * @return True if all properties between [item] and this are the same.
+     */
+    fun compareContents(item:FoodItem): Boolean {
+        return title == item.title && isChecked == item.isChecked && compareDates(item) == 0 && deepFreeze == item.deepFreeze
     }
 }
 

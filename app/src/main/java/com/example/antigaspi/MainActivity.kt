@@ -72,11 +72,11 @@ class MainActivity : AppCompatActivity() {
         // add items from shared preferences to the adapter
         foodItemAdapter.getFoodItems().addAll(sharedPreferencesHelper.loadFoodItemList())
 
-        // dummy items TODO: Remove this
-        foodItemAdapter.getFoodItems().add(FoodItem(title = "aaaaa", expirationDate = Date(124,7,20,1,1,1)))
-        foodItemAdapter.getFoodItems().add(FoodItem(title = "bbbbb", expirationDate = Date(124,7,22,1,1,1)))
-        foodItemAdapter.getFoodItems().add(FoodItem(title = "cccccc", expirationDate = Date(124,7,24,1,1,1)))
-        foodItemAdapter.getFoodItems().add(FoodItem(title = "dddddd", expirationDate = Date(124,7,26,1,1,1)))
+        // TODO: Remove dummy items
+        foodItemAdapter.getFoodItems().add(FoodItem(title = "ab", expirationDate = Date(124,7,20,1,1,1)))
+        foodItemAdapter.getFoodItems().add(FoodItem(title = "ac", expirationDate = Date(124,7,22,1,1,1)))
+        foodItemAdapter.getFoodItems().add(FoodItem(title = "ad", expirationDate = Date(124,7,24,1,1,1)))
+        foodItemAdapter.getFoodItems().add(FoodItem(title = "ae", expirationDate = Date(124,7,26,1,1,1)))
 
         // Set up recyclerview
         val rvFoodItems = findViewById<RecyclerView>(R.id.rvFoodItems)
@@ -86,8 +86,12 @@ class MainActivity : AppCompatActivity() {
         // editText for filtering by a string
         val etFilter = findViewById<EditText>(R.id.etFilter)
         etFilter.addTextChangedListener { input ->
+            foodItemAdapter.currentFilter = input.toString()
             foodItemAdapter.filter.filter(input)
         }
+
+        // somehow this is needed
+        foodItemAdapter.filter.filter("")
 
         // edittext in dialog
         val et = EditText(this)

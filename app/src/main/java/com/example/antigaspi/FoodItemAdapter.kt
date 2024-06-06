@@ -16,30 +16,45 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.SortedList
 import androidx.recyclerview.widget.SortedListAdapterCallback
 
+/**
+ * Adapter that has a filter.
+ * Set [currentFilter] first and then use [getFilter] to apply that filter.
+ */
 class FoodItemAdapter(
     private val context: Context,
 
-) : ListAdapter<FoodItem, FoodItemAdapter.FoodItemViewHolder>(diffUtil),Filterable {
+    ) : ListAdapter<FoodItem, FoodItemAdapter.FoodItemViewHolder>(diffUtil), Filterable {
+    /**
+     * List of foodItems. The current displayed list can be accessed by currentList
+     */
     private var foodItems: ArrayList<FoodItem> = arrayListOf()
 
-    // Filter by a CharSequence.
-    // Only keep the foodItems whose title contains the CharSequence.
-    private val filter : Filter = object : Filter() {
+    /**
+     * String that is used to filter ie only display certain items.
+     */
+    var currentFilter: String = ""
+
+    /**
+     * Filters by a CharSequence.
+     * Only keep the foodItems whose title contains the CharSequence.
+     */
+    private val filter: Filter = object : Filter() {
         override fun performFiltering(input: CharSequence): FilterResults {
-            val filteredList = if (input.isEmpty()) {
+            val filteredList = if (currentFilter.isEmpty()) {
                 foodItems
             } else {
-                foodItems.filter { it.title.lowercase().contains(input) }
+                foodItems.filter { it.title.lowercase().contains(currentFilter) }
             }
             return FilterResults().apply { values = filteredList }
         }
 
         override fun publishResults(input: CharSequence, results: FilterResults) {
             submitList(results.values as ArrayList<FoodItem>)
+            notifyDataSetChanged()
         }
     }
 
-    inner class FoodItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class FoodItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvFoodItemTitle: TextView = itemView.findViewById(R.id.tvFoodItemTitle)
         val cbDone: CheckBox = itemView.findViewById(R.id.cbDone)
 
@@ -79,19 +94,26 @@ class FoodItemAdapter(
         )
     }
 
-    fun addFoodItem(foodItem:FoodItem) {
+    fun addFoodItem(foodItem: FoodItem) {
         foodItems.add(foodItem)
         notifyItemInserted(foodItems.size - 1)
     }
 
-    // Remove all foodItems from the list that have [isChecked] == true
+    /**
+     * Remove all foodItems from the list that have [FoodItem.isChecked] == true.
+     * Updates the recyclerView.
+     */
     fun deleteDoneFoodItems() {
         foodItems.removeAll { item ->
             item.isChecked
         }
+        filter.filter(currentFilter)
         notifyDataSetChanged()
     }
 
+    /**
+     * Adds strike-through to the text of the [tvFoodItemTitle].
+     */
     private fun toggleStrikeThrough(tvFoodItemTitle: TextView, isChecked: Boolean) {
         if (isChecked) {
             tvFoodItemTitle.paintFlags = tvFoodItemTitle.paintFlags or STRIKE_THRU_TEXT_FLAG
@@ -123,8 +145,11 @@ class FoodItemAdapter(
         return foodItems
     }
 
-
+    /**
+     * @return the filter. Set [currentFilter] first and then call [Filter.filter] on this.
+     */
     override fun getFilter(): Filter {
         return filter
     }
+
 }
