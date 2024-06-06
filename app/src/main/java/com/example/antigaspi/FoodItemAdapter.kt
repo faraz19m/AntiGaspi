@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.SortedListAdapterCallback
 
 /**
  * Adapter that has a filter.
- * Set [currentFilter] first and then use [getFilter] to apply that filter.
+ * Set [currentFilter] and [showOnlyDeepFreeze] first and then use [filter] to apply that filter.
  */
 class FoodItemAdapter(
     private val context: Context,
@@ -99,6 +99,16 @@ class FoodItemAdapter(
         )
     }
 
+    /**
+     * Filters the items by [currentFilter] and [showOnlyDeepFreeze].
+     * Also updates the recyclerView.
+     * This should be used instead of [getFilter].
+     */
+    fun filter() {
+        filter.filter("")
+        notifyDataSetChanged()
+    }
+
     fun addFoodItem(foodItem: FoodItem) {
         foodItems.add(foodItem)
         notifyItemInserted(foodItems.size - 1)
@@ -112,8 +122,7 @@ class FoodItemAdapter(
         foodItems.removeAll { item ->
             item.isChecked
         }
-        filter.filter(currentFilter)
-        notifyDataSetChanged()
+        filter()
     }
 
     /**
@@ -151,7 +160,7 @@ class FoodItemAdapter(
     }
 
     /**
-     * @return the filter. Set [currentFilter] first and then call [Filter.filter] on this.
+     * @return the filter. Use the [filter] method instead of the getting this object.
      */
     override fun getFilter(): Filter {
         return filter
