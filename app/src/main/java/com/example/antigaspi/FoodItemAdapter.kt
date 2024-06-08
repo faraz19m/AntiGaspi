@@ -13,8 +13,6 @@ import android.widget.Filter
 import android.widget.Filterable
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.SortedList
-import androidx.recyclerview.widget.SortedListAdapterCallback
 
 /**
  * Adapter that has a filter.
@@ -66,7 +64,7 @@ class FoodItemAdapter(
         init {
             // Add listener to each item. This listener starts a new intent with FoodItemDetailActivity.
             itemView.setOnClickListener {
-                val position = adapterPosition
+                val position = bindingAdapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val selectedItem = currentList[position]
                     val intent = Intent(context, FoodItemDetailActivity::class.java)
@@ -123,6 +121,7 @@ class FoodItemAdapter(
             item.isChecked
         }
         filter()
+        notifyDataSetChanged()
     }
 
     /**
@@ -149,7 +148,7 @@ class FoodItemAdapter(
             toggleStrikeThrough(tvFoodItemTitle, curFoodItem.isChecked)
             cbDone.setOnCheckedChangeListener { _, isChecked ->
                 toggleStrikeThrough(tvFoodItemTitle, isChecked)
-                curFoodItem.isChecked = !curFoodItem.isChecked
+                currentList[holder.bindingAdapterPosition].isChecked = isChecked
             }
         }
     }
