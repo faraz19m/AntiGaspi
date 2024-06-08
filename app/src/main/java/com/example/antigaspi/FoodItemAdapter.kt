@@ -107,9 +107,33 @@ class FoodItemAdapter(
         notifyDataSetChanged()
     }
 
-    fun addFoodItem(foodItem: FoodItem) {
+    fun add(foodItem: FoodItem) {
         foodItems.add(foodItem)
-        notifyItemInserted(foodItems.size - 1)
+
+        //foodItems.binarySearch {  }
+        sort()
+        notifyDataSetChanged()
+
+        //notifyItemInserted(foodItems.size - 1)
+    }
+
+
+    /**
+     * Add all items from [list] to the list of foodItems of this adapter.
+     */
+    fun addAll(list: MutableList<FoodItem>) {
+
+        foodItems.addAll(list)
+        sort()
+        notifyDataSetChanged()
+    }
+
+    /**
+     * Get the list of food items.
+     * For adding items it is better to use [add] or [addAll] than to directly use the underlying array.
+     */
+    fun getFoodItems(): ArrayList<FoodItem> {
+        return foodItems
     }
 
     /**
@@ -120,8 +144,16 @@ class FoodItemAdapter(
         foodItems.removeAll { item ->
             item.isChecked
         }
+        sort()
         filter()
         notifyDataSetChanged()
+    }
+
+    private fun sort() {
+        // TODO: Sort by date instead
+        foodItems.sortByDescending { it.title.length}
+
+
     }
 
     /**
@@ -154,9 +186,7 @@ class FoodItemAdapter(
     }
 
 
-    fun getFoodItems(): ArrayList<FoodItem> {
-        return foodItems
-    }
+
 
     /**
      * @return the filter. Use the [filter] method instead of the getting this object.

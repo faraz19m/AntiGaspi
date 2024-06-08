@@ -33,9 +33,9 @@ class FoodItem(
      * - A negative integer if this has a smaller date or if this is null
      * - 0 if both are the same or both are null.
      */
-    fun compareDates(item: FoodItem): Int {
+    fun compareDates(item: FoodItem?): Int {
         val t1 = this.expirationDate
-        val t2 = item.expirationDate
+        val t2 = item?.expirationDate
         return if (t1 == null && t2 == null) {
             0
         } else (if (t1  == null) {

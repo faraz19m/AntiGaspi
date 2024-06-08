@@ -70,13 +70,13 @@ class MainActivity : AppCompatActivity() {
         sharedPreferencesHelper = SharedPreferencesHelper(this)
         foodItemAdapter = FoodItemAdapter(this)
         // add items from shared preferences to the adapter
-        foodItemAdapter.getFoodItems().addAll(sharedPreferencesHelper.loadFoodItemList())
+        foodItemAdapter.addAll(sharedPreferencesHelper.loadFoodItemList())
 
         // TODO: Remove dummy items
-        foodItemAdapter.getFoodItems().add(FoodItem(title = "ab", expirationDate = Date(124,7,20,1,1,1)))
-        foodItemAdapter.getFoodItems().add(FoodItem(title = "ac", expirationDate = Date(124,7,22,1,1,1)))
-        foodItemAdapter.getFoodItems().add(FoodItem(title = "ad", expirationDate = Date(124,7,24,1,1,1)))
-        foodItemAdapter.getFoodItems().add(FoodItem(title = "ae", expirationDate = Date(124,7,26,1,1,1)))
+        foodItemAdapter.add(FoodItem(title = "ab", expirationDate = Date(124,7,20,1,1,1)))
+        foodItemAdapter.add(FoodItem(title = "ac", expirationDate = Date(124,7,22,1,1,1)))
+        foodItemAdapter.add(FoodItem(title = "ad", expirationDate = Date(124,7,24,1,1,1)))
+        foodItemAdapter.add(FoodItem(title = "ae", expirationDate = Date(124,7,26,1,1,1)))
 
         // Set up recyclerview
         val rvFoodItems = findViewById<RecyclerView>(R.id.rvFoodItems)
@@ -170,11 +170,11 @@ class MainActivity : AppCompatActivity() {
                         "Unknown Product"
                     }
                     Log.d("myapp", productName)
-                    foodItemAdapter.addFoodItem(FoodItem(productName.take(20)))
+                    foodItemAdapter.add(FoodItem(productName.take(20)))
                     sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
                 } catch (e: Exception) {
                     Log.e("myapp", "Error parsing JSON: ${e.message}")
-                    foodItemAdapter.addFoodItem(FoodItem("Error: ${e.message}"))
+                    foodItemAdapter.add(FoodItem("Error: ${e.message}"))
                     sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
                 }
 
@@ -238,7 +238,7 @@ class MainActivity : AppCompatActivity() {
     // If data is not empty, then that value will be used to create a new food item and store it.
     private fun processDataFromDialog(data: String) {
         if (data != "") {
-            foodItemAdapter.addFoodItem(FoodItem(data))
+            foodItemAdapter.add(FoodItem( data, false, Date(),false))
             sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
         }
 
