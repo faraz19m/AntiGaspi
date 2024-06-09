@@ -12,11 +12,27 @@ import androidx.appcompat.app.AppCompatActivity
 import android.content.Context
 import android.content.SharedPreferences
 
+
+/**
+ * Represents a page showing detail about a [FoodItem].
+ */
 class FoodItemDetailActivity : AppCompatActivity() {
+
+
+    companion object {
+        /**
+         * The key used to pass the index of the [FoodItem] that this activity represents.
+         * The index is from the list inside [SingletonList].
+         */
+        const val PREF_ITEM_INDEX:String = "item_index"
+    }
+
 
     private lateinit var ocrHelper: OCRHelper
     private lateinit var tvFoodItemTitle: TextView
+    private lateinit var tvExpirationDate: TextView
     private lateinit var tvScannedText: TextView
+    private lateinit var tvDeepFreeze: TextView
     private val REQUEST_IMAGE_CAPTURE = 1
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -27,12 +43,28 @@ class FoodItemDetailActivity : AppCompatActivity() {
         ocrHelper = OCRHelper(this)
         sharedPreferences = getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
 
-        // Get the data passed from MainActivity
-        val foodItemTitle = intent.getStringExtra("todo_title")
 
-        // Set the title to the TextView
+        // Get the index passed from MainActivity
+        val index = intent.getIntExtra(PREF_ITEM_INDEX,0)
+
+        // Set textViews
+        // SingletonList is used to get/modify the list
         tvFoodItemTitle = findViewById(R.id.tvFoodItemTitle)
-        tvFoodItemTitle.text = foodItemTitle
+        tvFoodItemTitle.text = SingletonList.theInstance.list[index].title
+
+        tvExpirationDate = findViewById(R.id.tvExpirationDate)
+        tvExpirationDate.text = SingletonList.theInstance.list[index].getPrettyDate()
+
+        tvDeepFreeze = findViewById(R.id.tvDeepFreeze)
+        tvDeepFreeze.text = if (SingletonList.theInstance.list[index].isDeepFrozen)  "This item is frozen" else "This item is not frozen"
+
+        tvDeepFreeze.setOnClickListener(
+            {
+                SingletonList.theInstance.list[index].isDeepFrozen = !SingletonList.theInstance.list[index].isDeepFrozen
+                tvDeepFreeze.text = if (SingletonList.theInstance.list[index].isDeepFrozen)  "This item is frozen" else "This item is not frozen"
+            }
+        )
+
 
         // Initialize the scanned text TextView
         tvScannedText = findViewById(R.id.tvScannedText)

@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-
+        var singletonList: SingletonList = SingletonList.getInstance()
 
 
 
@@ -68,9 +68,12 @@ class MainActivity : AppCompatActivity() {
 
         // For memory retention of the list
         sharedPreferencesHelper = SharedPreferencesHelper(this)
-        foodItemAdapter = FoodItemAdapter(this)
-        // add items from shared preferences to the adapter
+        foodItemAdapter = FoodItemAdapter()
+        singletonList.list = foodItemAdapter.getFoodItems()
+
+        // add items from shared preferences
         foodItemAdapter.addAll(sharedPreferencesHelper.loadFoodItemList())
+
 
         // TODO: Remove dummy items
         foodItemAdapter.add(FoodItem(title = "ab", expirationDate = Date(124,7,20,1,1,1)))

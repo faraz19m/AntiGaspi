@@ -7,13 +7,13 @@ import java.util.Date
  * @param title The  name of the item
  * @param isChecked If the item is checked
  * @param expirationDate When the item expires
- * @param deepFreeze If the item is deep frozen.
+ * @param isDeepFrozen If the item is deep frozen.
  */
 class FoodItem(
     var title:String,
     var isChecked: Boolean = false,
     var expirationDate: Date? = Date(),
-    var deepFreeze: Boolean = false,
+    var isDeepFrozen: Boolean = false,
 
     ) {
     /**
@@ -52,7 +52,7 @@ class FoodItem(
      * @return True if all properties between [item] and this are the same.
      */
     fun compareContents(item:FoodItem): Boolean {
-        return title == item.title && isChecked == item.isChecked && compareDates(item) == 0 && deepFreeze == item.deepFreeze
+        return title == item.title && isChecked == item.isChecked && compareDates(item) == 0 && isDeepFrozen == item.isDeepFrozen
     }
 }
 

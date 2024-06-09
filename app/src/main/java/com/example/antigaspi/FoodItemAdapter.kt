@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import android.content.Context
 import android.content.Intent
 import android.widget.Filter
 import android.widget.Filterable
@@ -22,10 +21,9 @@ import androidx.recyclerview.widget.ListAdapter
  *
  * @property foodItems List of [FoodItem].
  * @property currentFilter Only items containing this in their title are displayed.
- * @property showOnlyDeepFreeze If true, only show items where [FoodItem.deepFreeze].
+ * @property showOnlyDeepFreeze If true, only show items where [FoodItem.isDeepFrozen].
  */
 class FoodItemAdapter(
-    private val context: Context,
 
     ) : ListAdapter<FoodItem, FoodItemAdapter.FoodItemViewHolder>(diffUtil), Filterable {
     /**
@@ -62,18 +60,18 @@ class FoodItemAdapter(
     private val filter: Filter = object : Filter() {
         override fun performFiltering(input: CharSequence): FilterResults {
             val filteredList = if (currentFilter.isEmpty()) {
-                foodItems.filter { !showOnlyDeepFreeze || it.deepFreeze }
+                foodItems.filter { !showOnlyDeepFreeze || it.isDeepFrozen }
             } else {
                 foodItems.filter {
                     it.title.lowercase()
-                        .contains(currentFilter) && (!showOnlyDeepFreeze || it.deepFreeze)
+                        .contains(currentFilter) && (!showOnlyDeepFreeze || it.isDeepFrozen)
                 }
             }
             return FilterResults().apply { values = filteredList }
         }
 
-        override fun publishResults(input: CharSequence, results: FilterResults) {
-            submitList(results.values as ArrayList<FoodItem>)
+        override fun publishResults(input: CharSequence, results: FilterResults?) {
+            submitList(results?.values as ArrayList<FoodItem>)
             notifyDataSetChanged()
         }
     }
@@ -119,6 +117,13 @@ class FoodItemAdapter(
      */
     fun getFoodItems(): ArrayList<FoodItem> {
         return foodItems
+    }
+
+    /**
+     *
+     */
+    fun setFoodItems(list: ArrayList<FoodItem>) {
+        this.foodItems = list
     }
 
     /**
@@ -178,6 +183,16 @@ class FoodItemAdapter(
                 toggleStrikeThrough(tvFoodItemTitle, isChecked)
                 currentList[holder.bindingAdapterPosition].isChecked = isChecked
             }
+            // Add listener to each item. This listener starts a new intent with FoodItemDetailActivity.
+            this.setOnClickListener {
+                    // get index first
+                    val index = SingletonList.getInstance().list.indexOf(curFoodItem)
+
+                    val intent = Intent(context, FoodItemDetailActivity::class.java)
+                    intent.putExtra(FoodItemDetailActivity.PREF_ITEM_INDEX, index)
+                    context.startActivity(intent)
+
+            }
         }
     }
 
@@ -191,16 +206,6 @@ class FoodItemAdapter(
 
     inner class FoodItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         init {
-            // Add listener to each item. This listener starts a new intent with FoodItemDetailActivity.
-            itemView.setOnClickListener {
-                val position = bindingAdapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    val selectedItem = currentList[position]
-                    val intent = Intent(context, FoodItemDetailActivity::class.java)
-                    intent.putExtra("todo_title", selectedItem.title)
-                    context.startActivity(intent)
-                }
-            }
 
 
         }

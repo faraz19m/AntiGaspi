@@ -20,6 +20,14 @@
         android:textSize="18sp"
         android:text="Expiration date"/>
 
+    <!-- TextView to display the deep freeze-->
+    <TextView
+        android:id="@+id/tvDeepFreeze"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:text=""/>
+
     <!-- TextView to display the scanned text -->
     <TextView
         android:id="@+id/tvScannedText"
