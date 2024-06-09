@@ -23,9 +23,7 @@ import androidx.recyclerview.widget.ListAdapter
  * @property currentFilter Only items containing this in their title are displayed.
  * @property showOnlyDeepFreeze If true, only show items where [FoodItem.isDeepFrozen].
  */
-class FoodItemAdapter(
-
-    ) : ListAdapter<FoodItem, FoodItemAdapter.FoodItemViewHolder>(diffUtil), Filterable {
+class FoodItemAdapter: ListAdapter<FoodItem, FoodItemAdapter.FoodItemViewHolder>(diffUtil), Filterable {
     /**
      * List of foodItems.
      *
@@ -71,7 +69,8 @@ class FoodItemAdapter(
         }
 
         override fun publishResults(input: CharSequence, results: FilterResults?) {
-            submitList(results?.values as ArrayList<FoodItem>)
+            val res: ArrayList<*>? = results?.values as ArrayList<*>?
+            submitList(res?.filterIsInstance<FoodItem>())
             notifyDataSetChanged()
         }
     }
@@ -117,13 +116,6 @@ class FoodItemAdapter(
      */
     fun getFoodItems(): ArrayList<FoodItem> {
         return foodItems
-    }
-
-    /**
-     *
-     */
-    fun setFoodItems(list: ArrayList<FoodItem>) {
-        this.foodItems = list
     }
 
     /**
@@ -203,13 +195,7 @@ class FoodItemAdapter(
 
     }
 
-
-    inner class FoodItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        init {
-
-
-        }
-    }
+    inner class FoodItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     companion object {
         val diffUtil = object : DiffUtil.ItemCallback<FoodItem>() {

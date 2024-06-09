@@ -43,6 +43,8 @@ class FoodItemDetailActivity : AppCompatActivity() {
         ocrHelper = OCRHelper(this)
         sharedPreferences = getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
 
+        val sharedPreferencesHelper = SharedPreferencesHelper(this)
+
 
         // Get the index passed from MainActivity
         val index = intent.getIntExtra(PREF_ITEM_INDEX,0)
@@ -58,12 +60,12 @@ class FoodItemDetailActivity : AppCompatActivity() {
         tvDeepFreeze = findViewById(R.id.tvDeepFreeze)
         tvDeepFreeze.text = if (SingletonList.theInstance.list[index].isDeepFrozen)  "This item is frozen" else "This item is not frozen"
 
-        tvDeepFreeze.setOnClickListener(
-            {
-                SingletonList.theInstance.list[index].isDeepFrozen = !SingletonList.theInstance.list[index].isDeepFrozen
-                tvDeepFreeze.text = if (SingletonList.theInstance.list[index].isDeepFrozen)  "This item is frozen" else "This item is not frozen"
-            }
-        )
+        tvDeepFreeze.setOnClickListener {
+            SingletonList.theInstance.list[index].isDeepFrozen = !SingletonList.theInstance.list[index].isDeepFrozen
+            tvDeepFreeze.text = if (SingletonList.theInstance.list[index].isDeepFrozen) "This item is frozen" else "This item is not frozen"
+            sharedPreferencesHelper.saveFoodItemList(SingletonList.theInstance.list)
+
+        }
 
 
         // Initialize the scanned text TextView

@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        var singletonList: SingletonList = SingletonList.getInstance()
+        val singletonList: SingletonList = SingletonList.getInstance()
 
 
 
