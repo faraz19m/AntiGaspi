@@ -15,27 +15,45 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 
 /**
- * Adapter that has a filter.
- * Set [currentFilter] and [showOnlyDeepFreeze] first and then use [filter] to apply that filter.
+ * Adapter that has a filter. Updates the recyclerview on adding/removing items.
+ *
+ * Use [currentFilter] and [showOnlyDeepFreeze] to change the filter.
+ * Use [add], [addAll] and [deleteDoneFoodItems] to add or remove items. These methods automatically update the recyclerview.
+ *
+ * @property foodItems List of [FoodItem].
+ * @property currentFilter Only items containing this in their title are displayed.
+ * @property showOnlyDeepFreeze If true, only show items where [FoodItem.deepFreeze].
  */
 class FoodItemAdapter(
     private val context: Context,
 
     ) : ListAdapter<FoodItem, FoodItemAdapter.FoodItemViewHolder>(diffUtil), Filterable {
     /**
-     * List of foodItems. The current displayed list can be accessed by currentList
+     * List of foodItems.
+     *
+     * The current displayed list can be accessed by currentList.
      */
     private var foodItems: ArrayList<FoodItem> = arrayListOf()
 
     /**
-     * String that is used to filter ie only display certain items.
+     * String that is used to only display certain items.
+     * Setting this value also calls [filter].
      */
     var currentFilter: String = ""
+        set(value) {
+            field = value
+            filter()
+        }
 
     /**
-     * If true then the recyclerView only shows items where [FoodItem.isChecked].
+     * If the recyclerView only shows items where [FoodItem.isChecked].
+     * Setting this value also calls [filter].
      */
     var showOnlyDeepFreeze = false
+        set(value) {
+            field = value
+            filter()
+        }
 
     /**
      * Filters by a CharSequence.
@@ -46,7 +64,10 @@ class FoodItemAdapter(
             val filteredList = if (currentFilter.isEmpty()) {
                 foodItems.filter { !showOnlyDeepFreeze || it.deepFreeze }
             } else {
-                foodItems.filter { it.title.lowercase().contains(currentFilter) && (!showOnlyDeepFreeze || it.deepFreeze) }
+                foodItems.filter {
+                    it.title.lowercase()
+                        .contains(currentFilter) && (!showOnlyDeepFreeze || it.deepFreeze)
+                }
             }
             return FilterResults().apply { values = filteredList }
         }
@@ -57,10 +78,118 @@ class FoodItemAdapter(
         }
     }
 
-    inner class FoodItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvFoodItemTitle: TextView = itemView.findViewById(R.id.tvFoodItemTitle)
-        val cbDone: CheckBox = itemView.findViewById(R.id.cbDone)
 
+    /**
+     * Filters the displayed items by [currentFilter] and [showOnlyDeepFreeze].
+     * Also updates the recyclerView.
+     */
+    private fun filter() {
+        filter.filter("")
+        notifyDataSetChanged()
+    }
+
+    /**
+     * Adds [foodItem] to the list of items.
+     * Also updates the recyclerview.
+     */
+    fun add(foodItem: FoodItem) {
+        foodItems.add(foodItem)
+        sort()
+        filter()
+        // TODO: Use notifyItemInserted() instead to make this more efficient. Also do this for addAll() and deleteDoneFoodItems().
+        notifyDataSetChanged()
+        //notifyItemInserted(foodItems.size - 1)
+    }
+
+
+    /**
+     * Add all items from [list] to the list of foodItems of this adapter.
+     * Also updates the recyclerview.
+     */
+    fun addAll(list: MutableList<FoodItem>) {
+        foodItems.addAll(list)
+        sort()
+        filter()
+        notifyDataSetChanged()
+    }
+
+    /**
+     * Get the list of food items.
+     * For adding items use [add] or [addAll] rather directly using this underlying array.
+     */
+    fun getFoodItems(): ArrayList<FoodItem> {
+        return foodItems
+    }
+
+    /**
+     * Remove all foodItems from the list that have [FoodItem.isChecked].
+     * Also updates the recyclerview.
+     */
+    fun deleteDoneFoodItems() {
+        foodItems.removeAll { item ->
+            item.isChecked
+        }
+        sort()
+        filter()
+        notifyDataSetChanged()
+    }
+
+    /**
+     * Sorts [foodItems].
+     */
+    private fun sort() {
+        // TODO: Sort by date instead
+        foodItems.sortByDescending { it.title.length }
+
+    }
+
+    /**
+     * Toggles the strike-through of the text of the [tvFoodItemTitle].
+     */
+    private fun toggleStrikeThrough(tvFoodItemTitle: TextView, isChecked: Boolean) {
+        if (isChecked) {
+            tvFoodItemTitle.paintFlags = tvFoodItemTitle.paintFlags or STRIKE_THRU_TEXT_FLAG
+        } else {
+            tvFoodItemTitle.paintFlags = tvFoodItemTitle.paintFlags and STRIKE_THRU_TEXT_FLAG.inv()
+        }
+    }
+
+
+    /**
+     * @return the filter.
+     * For filtering, use the [filter] method instead of getting this object.
+     */
+    override fun getFilter(): Filter {
+        return filter
+    }
+
+    override fun onBindViewHolder(holder: FoodItemViewHolder, position: Int) {
+        val curFoodItem = currentList[position]
+
+        holder.itemView.apply {
+            val tvFoodItemTitle = findViewById<TextView>(R.id.tvFoodItemTitle)
+            val tvExpirationDate = findViewById<TextView>(R.id.tvExpirationDate)
+            val cbDone = findViewById<CheckBox>(R.id.cbDone)
+            tvFoodItemTitle.text = curFoodItem.title
+            tvExpirationDate.text = curFoodItem.getPrettyDate()
+            cbDone.isChecked = curFoodItem.isChecked
+            toggleStrikeThrough(tvFoodItemTitle, curFoodItem.isChecked)
+            cbDone.setOnCheckedChangeListener { _, isChecked ->
+                toggleStrikeThrough(tvFoodItemTitle, isChecked)
+                currentList[holder.bindingAdapterPosition].isChecked = isChecked
+            }
+        }
+    }
+
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        filter()
+
+    }
+
+
+    inner class FoodItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         init {
             // Add listener to each item. This listener starts a new intent with FoodItemDetailActivity.
             itemView.setOnClickListener {
@@ -97,102 +226,5 @@ class FoodItemAdapter(
         )
     }
 
-    /**
-     * Filters the items by [currentFilter] and [showOnlyDeepFreeze].
-     * Also updates the recyclerView.
-     * This should be used instead of [getFilter].
-     */
-    fun filter() {
-        filter.filter("")
-        notifyDataSetChanged()
-    }
-
-    fun add(foodItem: FoodItem) {
-        foodItems.add(foodItem)
-
-        //foodItems.binarySearch {  }
-        sort()
-        notifyDataSetChanged()
-
-        //notifyItemInserted(foodItems.size - 1)
-    }
-
-
-    /**
-     * Add all items from [list] to the list of foodItems of this adapter.
-     */
-    fun addAll(list: MutableList<FoodItem>) {
-
-        foodItems.addAll(list)
-        sort()
-        notifyDataSetChanged()
-    }
-
-    /**
-     * Get the list of food items.
-     * For adding items it is better to use [add] or [addAll] than to directly use the underlying array.
-     */
-    fun getFoodItems(): ArrayList<FoodItem> {
-        return foodItems
-    }
-
-    /**
-     * Remove all foodItems from the list that have [FoodItem.isChecked] == true.
-     * Updates the recyclerView.
-     */
-    fun deleteDoneFoodItems() {
-        foodItems.removeAll { item ->
-            item.isChecked
-        }
-        sort()
-        filter()
-        notifyDataSetChanged()
-    }
-
-    private fun sort() {
-        // TODO: Sort by date instead
-        foodItems.sortByDescending { it.title.length}
-
-
-    }
-
-    /**
-     * Adds strike-through to the text of the [tvFoodItemTitle].
-     */
-    private fun toggleStrikeThrough(tvFoodItemTitle: TextView, isChecked: Boolean) {
-        if (isChecked) {
-            tvFoodItemTitle.paintFlags = tvFoodItemTitle.paintFlags or STRIKE_THRU_TEXT_FLAG
-        } else {
-            tvFoodItemTitle.paintFlags = tvFoodItemTitle.paintFlags and STRIKE_THRU_TEXT_FLAG.inv()
-        }
-    }
-
-    override fun onBindViewHolder(holder: FoodItemViewHolder, position: Int) {
-        val curFoodItem = currentList[position]
-
-        holder.itemView.apply {
-            val tvFoodItemTitle = findViewById<TextView>(R.id.tvFoodItemTitle)
-            val tvExpirationDate = findViewById<TextView>(R.id.tvExpirationDate)
-            val cbDone = findViewById<CheckBox>(R.id.cbDone)
-            tvFoodItemTitle.text = curFoodItem.title
-            tvExpirationDate.text = curFoodItem.getPrettyDate()
-            cbDone.isChecked = curFoodItem.isChecked
-            toggleStrikeThrough(tvFoodItemTitle, curFoodItem.isChecked)
-            cbDone.setOnCheckedChangeListener { _, isChecked ->
-                toggleStrikeThrough(tvFoodItemTitle, isChecked)
-                currentList[holder.bindingAdapterPosition].isChecked = isChecked
-            }
-        }
-    }
-
-
-
-
-    /**
-     * @return the filter. Use the [filter] method instead of the getting this object.
-     */
-    override fun getFilter(): Filter {
-        return filter
-    }
 
 }

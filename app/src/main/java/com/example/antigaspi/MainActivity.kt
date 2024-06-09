@@ -87,11 +87,8 @@ class MainActivity : AppCompatActivity() {
         val etFilter = findViewById<EditText>(R.id.etFilter)
         etFilter.addTextChangedListener { input ->
             foodItemAdapter.currentFilter = input.toString()
-            foodItemAdapter.filter()
         }
 
-        // somehow this is needed
-        foodItemAdapter.filter()
 
         // edittext in dialog
         val et = EditText(this)
@@ -102,7 +99,6 @@ class MainActivity : AppCompatActivity() {
         builder.setPositiveButton("OK") { dialog: DialogInterface?, which: Int ->
             processDataFromDialog(et.text.toString())
             et.text.clear()
-            foodItemAdapter.filter()
         }
         builder.setNegativeButton("Back", { dialogInterface: DialogInterface, i: Int ->
 
@@ -121,7 +117,6 @@ class MainActivity : AppCompatActivity() {
         val cbDeepFreeze = findViewById<CheckBox>(R.id.cbSelectDeepFreeze)
         cbDeepFreeze.setOnCheckedChangeListener { _, isChecked ->
             foodItemAdapter.showOnlyDeepFreeze = isChecked
-            foodItemAdapter.filter()
         }
 
 
