@@ -12,27 +12,61 @@ import androidx.appcompat.app.AppCompatActivity
 import android.content.Context
 import android.content.SharedPreferences
 
-class TodoDetailActivity : AppCompatActivity() {
+
+/**
+ * Represents a page showing detail about a [FoodItem].
+ */
+class FoodItemDetailActivity : AppCompatActivity() {
+
+
+    companion object {
+        /**
+         * The key used to pass the index of the [FoodItem] that this activity represents.
+         * The index is from the list inside [SingletonList].
+         */
+        const val PREF_ITEM_INDEX:String = "item_index"
+    }
+
 
     private lateinit var ocrHelper: OCRHelper
-    private lateinit var tvTodoTitle: TextView
+    private lateinit var tvFoodItemTitle: TextView
+    private lateinit var tvExpirationDate: TextView
     private lateinit var tvScannedText: TextView
+    private lateinit var tvDeepFreeze: TextView
     private val REQUEST_IMAGE_CAPTURE = 1
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_todo_detail)
+        setContentView(R.layout.activity_food_item_detail)
 
         ocrHelper = OCRHelper(this)
         sharedPreferences = getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
 
-        // Get the data passed from MainActivity
-        val todoTitle = intent.getStringExtra("todo_title")
+        val sharedPreferencesHelper = SharedPreferencesHelper(this)
 
-        // Set the todo title to the TextView
-        tvTodoTitle = findViewById(R.id.tvTodoTitle)
-        tvTodoTitle.text = todoTitle
+
+        // Get the index passed from MainActivity
+        val index = intent.getIntExtra(PREF_ITEM_INDEX,0)
+
+        // Set textViews
+        // SingletonList is used to get/modify the list
+        tvFoodItemTitle = findViewById(R.id.tvFoodItemTitle)
+        tvFoodItemTitle.text = SingletonList.theInstance.list[index].title
+
+        tvExpirationDate = findViewById(R.id.tvExpirationDate)
+        tvExpirationDate.text = SingletonList.theInstance.list[index].getPrettyDate()
+
+        tvDeepFreeze = findViewById(R.id.tvDeepFreeze)
+        tvDeepFreeze.text = if (SingletonList.theInstance.list[index].isDeepFrozen)  "This item is frozen" else "This item is not frozen"
+
+        tvDeepFreeze.setOnClickListener {
+            SingletonList.theInstance.list[index].isDeepFrozen = !SingletonList.theInstance.list[index].isDeepFrozen
+            tvDeepFreeze.text = if (SingletonList.theInstance.list[index].isDeepFrozen) "This item is frozen" else "This item is not frozen"
+            sharedPreferencesHelper.saveFoodItemList(SingletonList.theInstance.list)
+
+        }
+
 
         // Initialize the scanned text TextView
         tvScannedText = findViewById(R.id.tvScannedText)

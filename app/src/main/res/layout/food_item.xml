@@ -7,23 +7,36 @@
     android:paddingEnd="8dp">
 
     <TextView
-        android:id="@+id/tvTodoTitle"
+        android:id="@+id/tvFoodItemTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="test"
+        android:text="Food Item"
         android:textSize="20sp"
         android:background="@drawable/textview_border"
         android:padding="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/cbDone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/tvExpirationDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Expiration date"
+        android:textSize="20sp"
+        android:background="@drawable/textview_border"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/tvFoodItemTitle"
+
+        />
 
     <CheckBox
         android:id="@+id/cbDone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/tvExpirationDate"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

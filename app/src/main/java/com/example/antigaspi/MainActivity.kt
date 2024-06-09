@@ -9,11 +9,13 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.common.api.OptionalModuleApi
@@ -31,11 +33,12 @@ import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
+import java.util.Date
 
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var todoAdapter: TodoAdapter
+    private lateinit var foodItemAdapter: FoodItemAdapter
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
 
@@ -51,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-
+        val singletonList: SingletonList = SingletonList.getInstance()
 
 
 
@@ -63,15 +66,31 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
         // For memory retention of the list
         sharedPreferencesHelper = SharedPreferencesHelper(this)
-        todoAdapter = TodoAdapter(this, sharedPreferencesHelper.loadTodoList())
+        foodItemAdapter = FoodItemAdapter()
+        singletonList.list = foodItemAdapter.getFoodItems()
 
-        val rvTodoItems = findViewById<RecyclerView>(R.id.rvFoodItems)
-        rvTodoItems.adapter = todoAdapter
-        rvTodoItems.layoutManager = LinearLayoutManager(this)
+        // add items from shared preferences
+        foodItemAdapter.addAll(sharedPreferencesHelper.loadFoodItemList())
 
+
+        // TODO: Remove dummy items
+        foodItemAdapter.add(FoodItem(title = "ab", expirationDate = Date(124,7,20,1,1,1)))
+        foodItemAdapter.add(FoodItem(title = "ac", expirationDate = Date(124,7,22,1,1,1)))
+        foodItemAdapter.add(FoodItem(title = "ad", expirationDate = Date(124,7,24,1,1,1)))
+        foodItemAdapter.add(FoodItem(title = "ae", expirationDate = Date(124,7,26,1,1,1)))
+
+        // Set up recyclerview
+        val rvFoodItems = findViewById<RecyclerView>(R.id.rvFoodItems)
+        rvFoodItems.adapter = foodItemAdapter
+        rvFoodItems.layoutManager = LinearLayoutManager(this)
+
+        // editText for filtering by a string
+        val etFilter = findViewById<EditText>(R.id.etFilter)
+        etFilter.addTextChangedListener { input ->
+            foodItemAdapter.currentFilter = input.toString()
+        }
 
 
         // edittext in dialog
@@ -83,7 +102,6 @@ class MainActivity : AppCompatActivity() {
         builder.setPositiveButton("OK") { dialog: DialogInterface?, which: Int ->
             processDataFromDialog(et.text.toString())
             et.text.clear()
-
         }
         builder.setNegativeButton("Back", { dialogInterface: DialogInterface, i: Int ->
 
@@ -96,13 +114,20 @@ class MainActivity : AppCompatActivity() {
             dialog.show()
 
 
+
         }
+
+        val cbDeepFreeze = findViewById<CheckBox>(R.id.cbSelectDeepFreeze)
+        cbDeepFreeze.setOnCheckedChangeListener { _, isChecked ->
+            foodItemAdapter.showOnlyDeepFreeze = isChecked
+        }
+
 
         // button to delete items
         val btnDeleteDone = findViewById<Button>(R.id.btnDeleteDoneItems)
         btnDeleteDone.setOnClickListener {
-            todoAdapter.deleteDoneTodos()
-            sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
+            foodItemAdapter.deleteDoneFoodItems()
+            sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
         }
 
 
@@ -143,12 +168,12 @@ class MainActivity : AppCompatActivity() {
                         "Unknown Product"
                     }
                     Log.d("myapp", productName)
-                    todoAdapter.addTodo(Todo(productName.take(20)))
-                    sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
+                    foodItemAdapter.add(FoodItem(productName.take(20)))
+                    sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
                 } catch (e: Exception) {
                     Log.e("myapp", "Error parsing JSON: ${e.message}")
-                    todoAdapter.addTodo(Todo("Error: ${e.message}"))
-                    sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
+                    foodItemAdapter.add(FoodItem("Error: ${e.message}"))
+                    sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
                 }
 
             }
@@ -211,8 +236,8 @@ class MainActivity : AppCompatActivity() {
     // If data is not empty, then that value will be used to create a new food item and store it.
     private fun processDataFromDialog(data: String) {
         if (data != "") {
-            todoAdapter.addTodo(Todo(data))
-            sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
+            foodItemAdapter.add(FoodItem( data, false, Date(),false))
+            sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
         }
 
     }
@@ -249,7 +274,7 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onDestroy() {
-        sharedPreferencesHelper.saveTodoList(todoAdapter.getTodos())
+        sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
         super.onDestroy()
     }
 

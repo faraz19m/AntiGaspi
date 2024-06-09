@@ -7,11 +7,26 @@
 
     <!-- TextView to display the item name -->
     <TextView
-        android:id="@+id/tvTodoTitle"
+        android:id="@+id/tvFoodItemTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:text="Todo Title"/>
+        android:text="Food item title"/>
+    <!-- TextView to display the expiration date -->
+    <TextView
+        android:id="@+id/tvExpirationDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:text="Expiration date"/>
+
+    <!-- TextView to display the deep freeze-->
+    <TextView
+        android:id="@+id/tvDeepFreeze"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:text=""/>
 
     <!-- TextView to display the scanned text -->
     <TextView
