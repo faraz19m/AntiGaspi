@@ -7,6 +7,8 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.util.regex.Pattern
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class OCRHelper(private val context: Context) {
 
@@ -20,7 +22,9 @@ class OCRHelper(private val context: Context) {
                 Log.d("OCRHelper", "Recognized text: $recognizedText")
                 val expiryDate = extractExpiryDate(recognizedText)
                 Log.d("OCRHelper", "expiry date text: $expiryDate")
-                callback(expiryDate)
+                val formattedDate = expiryDate?.let { formatDate(it) }
+                Log.d("OCRHelper", "formatted date: $formattedDate")
+                callback(formattedDate)
             }
             .addOnFailureListener { e ->
                 Log.e("OCRHelper", "Text recognition failed: ${e.message}")
@@ -53,6 +57,35 @@ class OCRHelper(private val context: Context) {
         }
 
         return lastMatch
+    }
+
+    private fun formatDate(dateStr: String): String {
+        val inputFormats = arrayOf(
+            SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()),
+            SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()),
+            SimpleDateFormat("dd MM yyyy", Locale.getDefault()),
+            SimpleDateFormat("dd MMM yyyy", Locale.getDefault()),
+            SimpleDateFormat("dd/MM/yy", Locale.getDefault()),
+            SimpleDateFormat("dd-MM-yy", Locale.getDefault()),
+            SimpleDateFormat("dd MM yy", Locale.getDefault()),
+            SimpleDateFormat("dd MMM yy", Locale.getDefault())
+        )
+
+        val outputFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+
+        for (inputFormat in inputFormats) {
+            try {
+                val date = inputFormat.parse(dateStr)
+                if (date != null) {
+                    return outputFormat.format(date)
+                }
+            } catch (e: Exception) {
+                // Ignore parsing exceptions and try the next format
+            }
+        }
+
+        // Return the original string if no formats matched
+        return dateStr
     }
 
 

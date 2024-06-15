@@ -1,5 +1,6 @@
 package com.example.antigaspi
 
+import java.util.Calendar
 import java.util.Date
 
 /**
@@ -12,14 +13,20 @@ import java.util.Date
 class FoodItem(
     var title:String,
     var isChecked: Boolean = false,
-    var expirationDate: Date? = Date(),
+    var expirationDate: Date? = null,
     var isDeepFrozen: Boolean = false,
 
     ) {
+
     /**
      * @return A string of the [expirationDate] used to display to the user.
      */
     fun getPrettyDate(): String {
+        val calendar = Calendar.getInstance()
+        calendar.time = Date() // Set current date
+        calendar.add(Calendar.MONTH, 1) // Add one month
+        expirationDate = calendar.time
+
         val d = expirationDate ?: return "/"
         var res = ""
         res = res + d.date + "."+ d.month + "."+ (d.year + 1900)
