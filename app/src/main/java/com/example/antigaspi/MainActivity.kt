@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var foodItemAdapter: FoodItemAdapter
     private lateinit var sharedPreferencesHelper: SharedPreferencesHelper
-
+    private lateinit var expiryChecker: ExpiryChecker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,13 +73,6 @@ class MainActivity : AppCompatActivity() {
 
         // add items from shared preferences
         foodItemAdapter.addAll(sharedPreferencesHelper.loadFoodItemList())
-
-
-        // TODO: Remove dummy items
-        foodItemAdapter.add(FoodItem(title = "ab", expirationDate = Date(124,7,20,1,1,1)))
-        foodItemAdapter.add(FoodItem(title = "ac", expirationDate = Date(124,7,22,1,1,1)))
-        foodItemAdapter.add(FoodItem(title = "ad", expirationDate = Date(124,7,24,1,1,1)))
-        foodItemAdapter.add(FoodItem(title = "ae", expirationDate = Date(124,7,26,1,1,1)))
 
         // Set up recyclerview
         val rvFoodItems = findViewById<RecyclerView>(R.id.rvFoodItems)
@@ -179,6 +172,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
+        // Initialize ExpiryChecker
+        expiryChecker = ExpiryChecker(this, foodItemAdapter, sharedPreferencesHelper)
+
+        // Check for expiring items
+        expiryChecker.checkForExpiringItems()
 
         // button for scanning
         val btnScan = findViewById<Button>(R.id.btnScan)

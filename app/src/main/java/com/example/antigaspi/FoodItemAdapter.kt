@@ -136,7 +136,7 @@ class FoodItemAdapter: ListAdapter<FoodItem, FoodItemAdapter.FoodItemViewHolder>
      */
     private fun sort() {
         // TODO: Sort by date instead
-        foodItems.sortByDescending { it.title.length }
+        foodItems.sortBy { it.expirationDate }
 
     }
 

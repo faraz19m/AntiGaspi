@@ -65,6 +65,8 @@ class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
             // Apply the adapter to the spinner.
             spinner.adapter = adapter
         }
+        val savedPosition = sharedPreferences.getInt("ExpirationDaysPosition", 0)
+        spinner.setSelection(savedPosition, true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -90,12 +92,11 @@ class SettingsActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        var ar = R.array.days_before_expiration
-        val spinner: Spinner = findViewById(R.id.sSetExpirationDays)
-        spinner.setSelection(position)
-        // TODO: Save the setting
-
-
+        val sharedPreferences = getSharedPreferences("ThemePref", Context.MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putInt("ExpirationDaysPosition", position)
+            apply()
+        }
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
