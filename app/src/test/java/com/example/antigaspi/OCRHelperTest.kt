@@ -6,54 +6,52 @@ import com.google.mlkit.vision.text.Text
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.mockito.InjectMocks
+import org.mockito.Mock
 import org.mockito.Mockito.*
+import org.mockito.MockitoAnnotations
 
 class OCRHelperTest {
 
+    @Mock
     private lateinit var context: Context
+
+    @InjectMocks
     private lateinit var ocrHelper: OCRHelper
+
+    @Mock
     private lateinit var bitmap: Bitmap
 
     @Before
     fun setUp() {
-        context = mock(Context::class.java)
-        ocrHelper = OCRHelper(context)
-        bitmap = mock(Bitmap::class.java)
+        MockitoAnnotations.openMocks(this)
     }
 
     @Test
-    // This test verifies that the OCRHelper correctly recognizes and formats text from an image
     fun recognizeTextFromImage_Success() {
-        // Arrange
         val recognizedText = "Recognized text: Expiry Date: 12/12/2022"
         val expectedFormattedDate = "12.12.2022"
         val visionText = mock(Text::class.java)
         `when`(visionText.text).thenReturn(recognizedText)
 
-        // Act
         var actualFormattedDate: String? = null
         ocrHelper.recognizeTextFromImage(bitmap) { date ->
             actualFormattedDate = date
         }
 
-        // Assert
         assertEquals(expectedFormattedDate, actualFormattedDate)
     }
 
     @Test
-    // This test checks the OCRHelper’s behavior when text recognition fails
     fun recognizeTextFromImage_Failure() {
-        // Arrange
         val exception = Exception("Text recognition failed")
 
-        // Act
         var callbackInvoked = false
         ocrHelper.recognizeTextFromImage(bitmap) { date ->
             callbackInvoked = true
             assertNull(date)
         }
 
-        // Assert
         assertTrue(callbackInvoked)
     }
 }
