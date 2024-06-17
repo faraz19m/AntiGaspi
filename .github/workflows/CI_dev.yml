@@ -40,9 +40,14 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
+        # installs the maven artifacts in your local repository
+      - name: install maven
+        run: ./gradlew publishToMavenLocal
+
       # Run the unit tests in location src/test/java
       - name: Run unit tests
-        run: ./gradlew test
+        run: ./gradlew check
+        # run: ./gradlew test
 
       - name: Archive test reports
         uses: actions/upload-artifact@v4
