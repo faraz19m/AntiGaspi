@@ -72,7 +72,7 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
 
-
+    // Android testing dependencies
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -84,4 +84,11 @@ dependencies {
     implementation(libs.gson)
 
     implementation("com.google.mlkit:text-recognition:16.0.0")
+
+    // Unit testing dependencies
+    testImplementation(libs.junit)
+    testImplementation("org.mockito:mockito-core:4.11.0")
+    testImplementation("org.mockito:mockito-inline:4.11.0")
+    testImplementation("org.mockito:mockito-kotlin:4.1.0")
+
 }
