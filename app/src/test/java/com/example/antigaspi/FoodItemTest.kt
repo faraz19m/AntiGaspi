@@ -52,6 +52,6 @@ class FoodItemTest {
         val d = Date(120,6,7)
         val f1 = FoodItem("test", false, d, false )
 
-        assertEquals("6.7.2020", f1.getPrettyDate())
+        assertEquals("7.6.2020", f1.getPrettyDate())
     }
 }
