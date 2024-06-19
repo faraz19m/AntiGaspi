@@ -44,6 +44,7 @@ class FoodItemDetailActivity : AppCompatActivity() {
     private val REQUEST_IMAGE_CAPTURE = 1
     private lateinit var sharedPreferences: SharedPreferences
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_food_item_detail)
@@ -51,7 +52,7 @@ class FoodItemDetailActivity : AppCompatActivity() {
         ocrHelper = OCRHelper(this)
         sharedPreferences = getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
 
-        val sharedPreferencesHelper = SharedPreferencesHelper(this)
+
 
 
         // Get the index passed from MainActivity
@@ -67,6 +68,8 @@ class FoodItemDetailActivity : AppCompatActivity() {
         // deep freeze button
         btnDeepFreeze = findViewById(R.id.btnDeepFreeze)
         btnDeepFreeze.text = if (SingletonList.theInstance.list[index].isDeepFrozen)  "Unfreeze" else "Freeze"
+
+        val sharedPreferencesHelper = SharedPreferencesHelper(this)
 
         btnDeepFreeze.setOnClickListener {
             SingletonList.theInstance.list[index].isDeepFrozen = !SingletonList.theInstance.list[index].isDeepFrozen
@@ -128,7 +131,7 @@ class FoodItemDetailActivity : AppCompatActivity() {
 
         // Load previously saved scanned text
         val savedText = sharedPreferences.getString("scannedText", "")
-        if (savedText != null && savedText.isNotEmpty()) {
+        if (!savedText.isNullOrEmpty()) {
             tvScannedText.text = savedText
         }
 
@@ -153,11 +156,15 @@ class FoodItemDetailActivity : AppCompatActivity() {
             val imageBitmap = data?.extras?.get("data") as Bitmap
             ocrHelper.recognizeTextFromImage(imageBitmap) { recognizedText ->
                 runOnUiThread {
-                    tvScannedText.text = recognizedText
-                    Toast.makeText(this, "Text recognized: $recognizedText", Toast.LENGTH_LONG).show()
-                    val editor = sharedPreferences.edit()
-                    editor.putString("scannedText", recognizedText)
-                    editor.apply()
+                    if (recognizedText !=null) {
+                        val index = intent.getIntExtra(PREF_ITEM_INDEX,0)
+                        tvScannedText.text = recognizedText
+                        Toast.makeText(this, "Text recognized: $recognizedText", Toast.LENGTH_LONG).show()
+                        SingletonList.theInstance.list[index].expirationDate = Date(recognizedText)
+                        val sharedPreferencesHelper = SharedPreferencesHelper(this)
+                        sharedPreferencesHelper.saveFoodItemList(SingletonList.theInstance.list)
+                    }
+
                 }
             }
         }
