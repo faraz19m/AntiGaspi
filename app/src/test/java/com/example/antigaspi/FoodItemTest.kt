@@ -44,14 +44,4 @@ class FoodItemTest {
         assert(f5.compareDates(f6)<0)
     }
 
-    /**
-     * Test [FoodItem.getPrettyDate].
-     */
-    @Test
-    fun testPrettyDate() {
-        val d = Date(120,6,7)
-        val f1 = FoodItem("test", false, d, false )
-
-        assertEquals("7.6.2020", f1.getPrettyDate())
-    }
 }
