@@ -23,11 +23,10 @@ class FoodItem(
      */
     fun getPrettyDate(): String {
         val calendar = Calendar.getInstance()
-        calendar.time = Date() // Set current date
+        calendar.time = if (this.expirationDate==null) Date(0) else this.expirationDate
         calendar.add(Calendar.MONTH, 1) // Add one month
-        expirationDate = calendar.time
-
-        val d = expirationDate ?: return "/"
+        val temp = calendar.time
+        val d = temp ?: return "/"
         var res = ""
         res = res + d.date + "."+ d.month + "."+ (d.year + 1900)
         return res
