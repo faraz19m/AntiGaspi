@@ -1,46 +1,97 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_margin="16dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- TextView to display the item name -->
     <TextView
         android:id="@+id/tvFoodItemTitle"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/btnEditTitle"
+        app:layout_constraintLeft_toLeftOf="parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:text="Food item title"/>
+        android:textSize="26sp"
+        android:gravity="center"
+        android:layout_margin="24dp"
+        android:text="Food Item Title"/>
+
+    <!-- Button to change the title -->
+    <ImageButton
+        android:id="@+id/btnEditTitle"
+        android:contentDescription="Edit the title"
+        android:src="@drawable/ic_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvFoodItemTitle"
+        app:layout_constraintBottom_toBottomOf="@+id/tvFoodItemTitle"
+        android:layout_margin="16dp"
+        />
+
+    <!-- spacer -->
+    <View
+        android:id="@+id/vSpace"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/tvExpirationDate"
+        app:layout_constraintTop_toTopOf="@id/tvFoodItemTitle"/>
+
     <!-- TextView to display the expiration date -->
     <TextView
         android:id="@+id/tvExpirationDate"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/vSpace"
         android:layout_height="wrap_content"
         android:textSize="18sp"
-        android:text="Expiration date"/>
+        android:layout_margin="16dp"
+        android:text="Expiration Date"/>
 
-    <!-- TextView to display the deep freeze-->
-    <TextView
-        android:id="@+id/tvDeepFreeze"
+    <Button
+        android:id="@+id/btnSelectDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvExpirationDate"
+        app:layout_constraintBottom_toBottomOf="@id/tvExpirationDate"
+        android:text="Change Date"
+        android:layout_marginRight="16dp"
+        />
+
+    <!-- Button to trigger text scanning -->
+    <Button
+        android:id="@+id/btnScanText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:text=""/>
+        app:layout_constraintTop_toBottomOf="@+id/tvExpirationDate"
+        android:layout_margin="16dp"
+        android:text="Scan an Expiration Date" />
+
+    <!-- Button to freeze an item -->
+    <Button
+        android:id="@+id/btnDeepFreeze"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnScanText"
+        android:layout_margin="16dp"
+        android:text="Freeze Item"/>
 
     <!-- TextView to display the scanned text -->
     <TextView
         android:id="@+id/tvScannedText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/btnDeepFreeze"
         android:textSize="18sp"
+        android:layout_margin="16dp"
         android:text="Scanned Text"/>
 
-    <!-- Button to trigger text scanning -->
-    <Button
-        android:id="@+id/btnScanText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Scan Text" />
 
-</LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
