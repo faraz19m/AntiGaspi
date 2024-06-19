@@ -24,6 +24,7 @@ class SharedPreferencesHelper(context: Context) {
         return list
     }
     fun getDaysBeforeExpiration(): Int {
-        return prefs.getInt("ExpirationDaysPosition", 3) // Default to 3 days
+        val savedPosition = prefs.getInt("ExpirationDaysPosition", 0)
+        return savedPosition
     }
 }
