@@ -58,13 +58,13 @@ class FoodItemDetailActivity : AppCompatActivity() {
         val index = intent.getIntExtra(PREF_ITEM_INDEX,0)
 
         // Set textViews
-        // SingletonList is used to get/modify the list
         tvFoodItemTitle = findViewById(R.id.tvFoodItemTitle)
         tvFoodItemTitle.text = SingletonList.theInstance.list[index].title
 
         tvExpirationDate = findViewById(R.id.tvExpirationDate)
         tvExpirationDate.text = SingletonList.theInstance.list[index].getPrettyDate()
 
+        // deep freeze button
         btnDeepFreeze = findViewById(R.id.btnDeepFreeze)
         btnDeepFreeze.text = if (SingletonList.theInstance.list[index].isDeepFrozen)  "Unfreeze" else "Freeze"
 
@@ -108,6 +108,7 @@ class FoodItemDetailActivity : AppCompatActivity() {
                 if (data != "") {
                     SingletonList.theInstance.list[index].title = data
                     sharedPreferencesHelper.saveFoodItemList(SingletonList.theInstance.list)
+                    tvFoodItemTitle.text = data
                 }
                 et.text.clear()
             }
@@ -163,7 +164,6 @@ class FoodItemDetailActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        // Clear the SharedPreferences when leaving the activity
         super.onDestroy()
     }
 }

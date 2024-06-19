@@ -224,6 +224,13 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    override fun onResume() {
+        super.onResume()
+        if (foodItemAdapter != null) {
+            foodItemAdapter.update()
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
         inflater.inflate(R.menu.menubar, menu)
