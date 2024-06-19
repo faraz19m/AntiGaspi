@@ -132,6 +132,17 @@ class FoodItemAdapter: ListAdapter<FoodItem, FoodItemAdapter.FoodItemViewHolder>
     }
 
     /**
+     * Updates the entire RecyclerView.
+     *
+     * Is inefficient, so should be used rarely.
+     */
+    fun update() {
+        sort()
+        filter()
+        notifyDataSetChanged()
+    }
+
+    /**
      * Sorts [foodItems].
      */
     private fun sort() {

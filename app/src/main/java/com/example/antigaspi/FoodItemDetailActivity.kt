@@ -10,7 +10,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import android.content.Context
+import android.content.DialogInterface
 import android.content.SharedPreferences
+import android.widget.EditText
+import android.widget.ImageButton
+import androidx.appcompat.app.AlertDialog
+import com.google.android.material.datepicker.MaterialDatePicker
+import java.util.Date
 
 
 /**
@@ -32,9 +38,12 @@ class FoodItemDetailActivity : AppCompatActivity() {
     private lateinit var tvFoodItemTitle: TextView
     private lateinit var tvExpirationDate: TextView
     private lateinit var tvScannedText: TextView
-    private lateinit var tvDeepFreeze: TextView
+    private lateinit var btnDeepFreeze: Button
+    private lateinit var btnSelectDate: Button
+    private lateinit var btnEditTitle: ImageButton
     private val REQUEST_IMAGE_CAPTURE = 1
     private lateinit var sharedPreferences: SharedPreferences
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,29 +52,77 @@ class FoodItemDetailActivity : AppCompatActivity() {
         ocrHelper = OCRHelper(this)
         sharedPreferences = getSharedPreferences("MySharedPref", Context.MODE_PRIVATE)
 
-        val sharedPreferencesHelper = SharedPreferencesHelper(this)
+
 
 
         // Get the index passed from MainActivity
         val index = intent.getIntExtra(PREF_ITEM_INDEX,0)
 
         // Set textViews
-        // SingletonList is used to get/modify the list
         tvFoodItemTitle = findViewById(R.id.tvFoodItemTitle)
         tvFoodItemTitle.text = SingletonList.theInstance.list[index].title
 
         tvExpirationDate = findViewById(R.id.tvExpirationDate)
         tvExpirationDate.text = SingletonList.theInstance.list[index].getPrettyDate()
 
-        tvDeepFreeze = findViewById(R.id.tvDeepFreeze)
-        tvDeepFreeze.text = if (SingletonList.theInstance.list[index].isDeepFrozen)  "This item is frozen" else "This item is not frozen"
+        // deep freeze button
+        btnDeepFreeze = findViewById(R.id.btnDeepFreeze)
+        btnDeepFreeze.text = if (SingletonList.theInstance.list[index].isDeepFrozen)  "Unfreeze" else "Freeze"
 
-        tvDeepFreeze.setOnClickListener {
+        val sharedPreferencesHelper = SharedPreferencesHelper(this)
+
+        btnDeepFreeze.setOnClickListener {
             SingletonList.theInstance.list[index].isDeepFrozen = !SingletonList.theInstance.list[index].isDeepFrozen
-            tvDeepFreeze.text = if (SingletonList.theInstance.list[index].isDeepFrozen) "This item is frozen" else "This item is not frozen"
+            btnDeepFreeze.text = if (SingletonList.theInstance.list[index].isDeepFrozen) "Unfreeze" else "Freeze"
             sharedPreferencesHelper.saveFoodItemList(SingletonList.theInstance.list)
 
         }
+        // set listener for selecting expiration date
+        btnSelectDate = findViewById(R.id.btnSelectDate)
+        btnSelectDate.setOnClickListener {
+            val materialDatePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select expiration date")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .setPositiveButtonText("Submit")
+                .build()
+            materialDatePicker.addOnPositiveButtonClickListener {time->
+                SingletonList.theInstance.list[index].expirationDate = Date(time)
+                tvExpirationDate.text = SingletonList.theInstance.list[index].getPrettyDate()
+                sharedPreferencesHelper.saveFoodItemList(SingletonList.theInstance.list)
+            }
+            materialDatePicker.addOnNegativeButtonClickListener {
+                Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show()
+            }
+
+            materialDatePicker.show(supportFragmentManager, "Date picker")
+        }
+
+        // set listener for changing the title
+        btnEditTitle = findViewById(R.id.btnEditTitle)
+        btnEditTitle.setOnClickListener {
+            // edittext in dialog
+            val et = EditText(this)
+            // create dialog
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+            builder.setTitle("Edit title")
+                .setView(et)
+            builder.setPositiveButton("OK") { _: DialogInterface?, _: Int ->
+                val data = et.text.toString()
+                if (data != "") {
+                    SingletonList.theInstance.list[index].title = data
+                    sharedPreferencesHelper.saveFoodItemList(SingletonList.theInstance.list)
+                    tvFoodItemTitle.text = data
+                }
+                et.text.clear()
+            }
+            builder.setNegativeButton("Back") { _: DialogInterface, _: Int ->
+
+            }
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
+        }
+
+
 
 
         // Initialize the scanned text TextView
@@ -74,7 +131,7 @@ class FoodItemDetailActivity : AppCompatActivity() {
 
         // Load previously saved scanned text
         val savedText = sharedPreferences.getString("scannedText", "")
-        if (savedText != null && savedText.isNotEmpty()) {
+        if (!savedText.isNullOrEmpty()) {
             tvScannedText.text = savedText
         }
 
@@ -99,18 +156,21 @@ class FoodItemDetailActivity : AppCompatActivity() {
             val imageBitmap = data?.extras?.get("data") as Bitmap
             ocrHelper.recognizeTextFromImage(imageBitmap) { recognizedText ->
                 runOnUiThread {
-                    tvScannedText.text = recognizedText
-                    Toast.makeText(this, "Text recognized: $recognizedText", Toast.LENGTH_LONG).show()
-                    val editor = sharedPreferences.edit()
-                    editor.putString("scannedText", recognizedText)
-                    editor.apply()
+                    if (recognizedText !=null) {
+                        val index = intent.getIntExtra(PREF_ITEM_INDEX,0)
+                        tvScannedText.text = recognizedText
+                        Toast.makeText(this, "Text recognized: $recognizedText", Toast.LENGTH_LONG).show()
+                        SingletonList.theInstance.list[index].expirationDate = Date(recognizedText)
+                        val sharedPreferencesHelper = SharedPreferencesHelper(this)
+                        sharedPreferencesHelper.saveFoodItemList(SingletonList.theInstance.list)
+                    }
+
                 }
             }
         }
     }
 
     override fun onDestroy() {
-        // Clear the SharedPreferences when leaving the activity
         super.onDestroy()
     }
 }
