@@ -83,14 +83,14 @@
         android:text="Freeze Item"/>
 
     <!-- TextView to display the scanned text -->
-    <TextView
-        android:id="@+id/tvScannedText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/btnDeepFreeze"
-        android:textSize="18sp"
-        android:layout_margin="16dp"
-        android:text="Scanned Text"/>
+<!--    <TextView-->
+<!--        android:id="@+id/tvScannedText"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/btnDeepFreeze"-->
+<!--        android:textSize="18sp"-->
+<!--        android:layout_margin="16dp"-->
+<!--        android:text="Scanned Text"/>-->
 
 
 

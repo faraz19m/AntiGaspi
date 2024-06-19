@@ -29,13 +29,12 @@ class ExpiryChecker(private val context: Context, private val foodItemAdapter: F
                 Log.d("ExpiryChecker function", "notification date: $notificationDate")
                 Log.d("ExpiryChecker function", "currenDate: $currentDate")
 
-                val compari = currentDate.compareTo(notificationDate) >= 0
-                Log.d("ExpiryChecker function", "comparison: $compari")
-                // Check if the current date is on or after the notification date
-                if (currentDate.compareTo(notificationDate) >= 0) {
-                    val diffInMillies = expiryDate.time - currentDate.time
-                    val diffInDays = (diffInMillies / (1000 * 60 * 60 * 24)).toInt()
+                val diffInMillies = expiryDate.time - currentDate.time
+                val diffInDays = (diffInMillies / (1000 * 60 * 60 * 24)).toInt()
 
+                Log.d("ExpiryChecker function", "comparison: $diffInDays")
+
+                if (diffInDays >= 0) {
                     Log.d("ExpiryChecker function", "diffInMillies: $diffInMillies")
                     Log.d("ExpiryChecker function", "diffInDays: $diffInDays")
                     notificationHelper.sendNotification(
