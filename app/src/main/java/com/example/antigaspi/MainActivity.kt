@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.antigaspi.helpers.ApiHelper
 import com.google.android.gms.common.api.OptionalModuleApi
 import com.google.android.gms.common.moduleinstall.ModuleInstall
 import com.google.android.gms.common.moduleinstall.ModuleInstallClient
@@ -25,14 +26,8 @@ import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.request.get
-import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.json.JSONObject
 import java.util.Date
 
 
@@ -92,13 +87,13 @@ class MainActivity : AppCompatActivity() {
         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
         builder.setTitle("Enter food name")
             .setView(et)
-        builder.setPositiveButton("OK") { dialog: DialogInterface?, which: Int ->
+        builder.setPositiveButton("OK") { _: DialogInterface?, _: Int ->
             processDataFromDialog(et.text.toString())
             et.text.clear()
         }
-        builder.setNegativeButton("Back", { dialogInterface: DialogInterface, i: Int ->
+        builder.setNegativeButton("Back") { _: DialogInterface, _: Int ->
 
-        })
+        }
 
         // button to add food manually opens dialog
         val btnAddFoodManually = findViewById<Button>(R.id.btnAddItemManually)
@@ -132,45 +127,6 @@ class MainActivity : AppCompatActivity() {
 
         val moduleInstallClient = ModuleInstall.getClient(this)
 
-        // http client
-        val httpClient = HttpClient(CIO) {
-
-        }
-
-        // send request to open food facts api
-        fun sendRequest(barcode: String) = runBlocking {
-            launch {
-                val url = "https://world.openfoodfacts.net/api/v2/product/" + barcode
-
-                Log.d("myapp Barcode", "Product JSON: ${barcode.toString()}")
-
-                Log.d("myapp", "sending request...")
-                val response: HttpResponse = httpClient.get(url)
-
-                val bd = response.body() as String
-
-
-                try {
-                    val json = JSONObject(bd)
-                    val product = JSONObject(json.getString("product"))
-                    Log.d("myapp", "Product JSON: ${product.toString()}")
-
-                    val productName = if (product.has("product_name")) {
-                        product.getString("product_name")
-                    } else {
-                        "Unknown Product"
-                    }
-                    Log.d("myapp", productName)
-                    foodItemAdapter.add(FoodItem(productName.take(20)))
-                    sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
-                } catch (e: Exception) {
-                    Log.e("myapp", "Error parsing JSON: ${e.message}")
-                    foodItemAdapter.add(FoodItem("Error: ${e.message}"))
-                    sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
-                }
-
-            }
-        }
 
 
         // Initialize ExpiryChecker
@@ -184,6 +140,7 @@ class MainActivity : AppCompatActivity() {
 
         val scanner = GmsBarcodeScanning.getClient(this)
 
+        val apiH = ApiHelper()
 
         // set listener for the scan
         btnScan.setOnClickListener {
@@ -195,14 +152,26 @@ class MainActivity : AppCompatActivity() {
                         // module is present, continue with scanning
                         scanner.startScan().addOnSuccessListener { barcode ->
                             Toast.makeText(applicationContext, "Scan success", Toast.LENGTH_LONG).show()
-                            sendRequest(barcode.rawValue.toString())
+
+                            runBlocking {
+                                launch {
+                                    val productName = apiH.getFoodNameFromBarcode(barcode.rawValue.toString())
+                                    if (productName.isNotEmpty()) {
+                                        foodItemAdapter.add(FoodItem(productName, false, Date(), false))
+                                        sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
+                                    } else {
+                                        Toast.makeText(applicationContext, "Error when retrieving item name ", Toast.LENGTH_LONG).show()
+                                    }
+
+                                }
+                            }
 
 
                         }
                             .addOnCanceledListener {
                                 Toast.makeText(applicationContext, "Scan cancelled", Toast.LENGTH_LONG).show()
                             }
-                            .addOnFailureListener { e ->
+                            .addOnFailureListener {
                                 Toast.makeText(applicationContext, "Scan fail", Toast.LENGTH_LONG).show()
                             }
 
@@ -223,12 +192,25 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            // open settings page
+            R.id.menubar_settings -> startActivity(Intent(this, SettingsActivity::class.java))
+
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
 
     override fun onResume() {
         super.onResume()
-        if (foodItemAdapter != null) {
-            foodItemAdapter.update()
-        }
+        foodItemAdapter.update()
+    }
+
+    override fun onDestroy() {
+        sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
+        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -248,15 +230,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId) {
-            // open settings page
-            R.id.menubar_settings -> startActivity(Intent(this, SettingsActivity::class.java))
-
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
     private fun moduleInstall(client: ModuleInstallClient) {
 
         val optionalModuleApi: OptionalModuleApi = GmsBarcodeScanning.getClient(this)
@@ -272,16 +245,10 @@ class MainActivity : AppCompatActivity() {
 
                 }
             }
-            .addOnFailureListener { e ->
+            .addOnFailureListener {
                 // Handle failure...
 
             }
-    }
-
-
-    override fun onDestroy() {
-        sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
-        super.onDestroy()
     }
 
 
