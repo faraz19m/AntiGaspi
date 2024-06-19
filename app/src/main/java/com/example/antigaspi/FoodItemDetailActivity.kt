@@ -17,6 +17,7 @@ import android.widget.ImageButton
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.util.Date
+import java.text.SimpleDateFormat
 
 
 /**
@@ -126,14 +127,14 @@ class FoodItemDetailActivity : AppCompatActivity() {
 
 
         // Initialize the scanned text TextView
-        tvScannedText = findViewById(R.id.tvScannedText)
-        tvScannedText.text = ""
+//        tvScannedText = findViewById(R.id.tvScannedText)
+//        tvScannedText.text = ""
 
         // Load previously saved scanned text
-        val savedText = sharedPreferences.getString("scannedText", "")
-        if (!savedText.isNullOrEmpty()) {
-            tvScannedText.text = savedText
-        }
+//        val savedText = sharedPreferences.getString("scannedText", "")
+//        if (!savedText.isNullOrEmpty()) {
+//            tvScannedText.text = savedText
+//        }
 
         val btnScanText = findViewById<Button>(R.id.btnScanText)
         btnScanText.setOnClickListener {
@@ -158,11 +159,21 @@ class FoodItemDetailActivity : AppCompatActivity() {
                 runOnUiThread {
                     if (recognizedText !=null) {
                         val index = intent.getIntExtra(PREF_ITEM_INDEX,0)
-                        tvScannedText.text = recognizedText
+                        tvExpirationDate.text = recognizedText
                         Toast.makeText(this, "Text recognized: $recognizedText", Toast.LENGTH_LONG).show()
-                        SingletonList.theInstance.list[index].expirationDate = Date(recognizedText)
-                        val sharedPreferencesHelper = SharedPreferencesHelper(this)
-                        sharedPreferencesHelper.saveFoodItemList(SingletonList.theInstance.list)
+
+                        // Parse the recognized text as a date
+                        val dateFormat = SimpleDateFormat("dd.MM.yyyy")
+                        try {
+                            val date = dateFormat.parse(recognizedText)
+                            SingletonList.theInstance.list[index].expirationDate = date
+
+                            val sharedPreferencesHelper = SharedPreferencesHelper(this)
+                            sharedPreferencesHelper.saveFoodItemList(SingletonList.theInstance.list)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            Toast.makeText(this, "Failed to parse date: $recognizedText", Toast.LENGTH_SHORT).show()
+                        }
                     }
 
                 }
