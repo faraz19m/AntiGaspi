@@ -38,7 +38,7 @@ class FoodItemDetailActivity : AppCompatActivity() {
     private lateinit var ocrHelper: OCRHelper
     private lateinit var tvFoodItemTitle: TextView
     private lateinit var tvExpirationDate: TextView
-    private lateinit var tvScannedText: TextView
+//    private lateinit var tvScannedText: TextView
     private lateinit var btnDeepFreeze: Button
     private lateinit var btnSelectDate: Button
     private lateinit var btnEditTitle: ImageButton

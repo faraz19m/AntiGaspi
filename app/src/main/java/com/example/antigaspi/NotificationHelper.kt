@@ -28,19 +28,22 @@ class NotificationHelper(private val context: Context) {
         }
     }
 
-    fun sendNotification(title: String, message: String) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            // Check for POST_NOTIFICATIONS permission on Android 13 and above
-            if (context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                // Permission is granted, send the notification
-                sendNotificationWithPermission(title, message)
+    fun sendNotification(title: String, message: String, itemIndex: Int) {
+        val foodItem = SingletonList.theInstance.list[itemIndex]
+        if (!foodItem.isDeepFrozen) { // if deep frozen, pause the notifications
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                // Check for POST_NOTIFICATIONS permission on Android 13 and above
+                if (context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                    // Permission is granted, send the notification
+                    sendNotificationWithPermission(title, message)
+                } else {
+                    // Permission is not granted, handle accordingly
+                    // TODO: Show a dialog to the user explaining why you need the permission and prompt them to grant it
+                }
             } else {
-                // Permission is not granted, handle accordingly
-                // TODO: Show a dialog to the user explaining why you need the permission and prompt them to grant it
+                // For older versions, send the notification without checking for POST_NOTIFICATIONS permission
+                sendNotificationWithPermission(title, message)
             }
-        } else {
-            // For older versions, send the notification without checking for POST_NOTIFICATIONS permission
-            sendNotificationWithPermission(title, message)
         }
     }
 
