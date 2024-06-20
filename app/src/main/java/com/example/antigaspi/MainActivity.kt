@@ -156,14 +156,13 @@ class MainActivity : AppCompatActivity() {
                     if (it.areModulesAvailable()) {
                         // module is present, continue with scanning
                         scanner.startScan().addOnSuccessListener { barcode ->
-                            Toast.makeText(applicationContext, "Scan success", Toast.LENGTH_LONG).show()
-
                             runBlocking {
                                 launch {
                                     val productName = apiH.getFoodNameFromBarcode(barcode.rawValue.toString())
                                     if (productName.isNotEmpty()) {
                                         foodItemAdapter.add(FoodItem(productName, false, Date(), false))
                                         sharedPreferencesHelper.saveFoodItemList(foodItemAdapter.getFoodItems())
+                                        Toast.makeText(applicationContext, "Scan success", Toast.LENGTH_LONG).show()
                                     } else {
                                         Toast.makeText(applicationContext, "Error when retrieving item name ", Toast.LENGTH_LONG).show()
                                     }

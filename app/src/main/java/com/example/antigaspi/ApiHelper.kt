@@ -35,14 +35,14 @@ class ApiHelper {
             try {
                 val json = JSONObject(bd)
                 val product = JSONObject(json.getString("product"))
-                Log.d("myapp", "Product JSON: $product")
+
 
                 val productName = if (product.has("product_name")) {
                     product.getString("product_name")
                 } else {
-                    "Unknown Product"
+                    return ""
                 }
-                Log.d("myapp", productName)
+
                 return productName.take(20)
 
             } catch (e: Exception) {
