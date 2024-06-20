@@ -34,6 +34,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import java.util.Date
+import java.util.Calendar
+import android.app.AlarmManager
+import android.app.PendingIntent
 
 
 class MainActivity : AppCompatActivity() {
@@ -179,6 +182,9 @@ class MainActivity : AppCompatActivity() {
         // Check for expiring items
         expiryChecker.checkForExpiringItems()
 
+        // Setup the daily alarm
+        setupDailyAlarm()
+
         // button for scanning
         val btnScan = findViewById<Button>(R.id.btnScan)
 
@@ -276,6 +282,35 @@ class MainActivity : AppCompatActivity() {
                 // Handle failure...
 
             }
+    }
+
+    fun setupDailyAlarm() {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, ExpiryCheckReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 11)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+        }
+
+        // If the set time already passed, move to the next day
+        if (calendar.timeInMillis <= System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
+
+        alarmManager.setRepeating(
+            AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            AlarmManager.INTERVAL_DAY,
+            pendingIntent
+        )
     }
 
 
