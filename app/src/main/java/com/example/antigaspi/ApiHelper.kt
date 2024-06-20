@@ -1,4 +1,4 @@
-package com.example.antigaspi.helpers
+package com.example.antigaspi
 
 import android.util.Log
 import io.ktor.client.HttpClient
